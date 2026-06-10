@@ -1,0 +1,31 @@
+---
+interface Props {
+  name: string;
+  legend: string;
+  options: string[];
+  required?: boolean;
+  columns?: boolean;
+}
+
+const { name, legend, options, required = false, columns = false } = Astro.props;
+---
+
+<fieldset class="field" data-field data-group="checkbox" data-required={required ? 'true' : 'false'}>
+  <legend>
+    {legend}
+    <span class={`field__req ${required ? 'is-required' : 'is-optional'}`}>
+      {required ? '必須' : '任意'}
+    </span>
+  </legend>
+  <div class={`choice-group${columns ? ' choice-group--cols' : ''}`}>
+    {
+      options.map((opt) => (
+        <label class="choice">
+          <input type="checkbox" name={`${name}[]`} value={opt} />
+          <span>{opt}</span>
+        </label>
+      ))
+    }
+  </div>
+  <span class="field__error">1つ以上選択してください。</span>
+</fieldset>

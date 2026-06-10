@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+  /** ヘッダーのCTA（ファーストビューへ戻すなど）に使うリンク先 */
+  headerHref?: string;
+}
+
+const {
+  title,
+  description = '士業団体・支部イベントの幹事業務を、必要なところだけお手伝いします。',
+  noindex = false,
+  headerHref,
+} = Astro.props;
+
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="site-header__brand" href={headerHref ?? withBase()}>
+          イベント幹事サポート
+        </a>
+        <slot name="header-cta" />
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p style="margin:0;">
+          &copy; {year} イベント幹事サポート. 士業団体・支部イベントの幹事業務サポート。
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

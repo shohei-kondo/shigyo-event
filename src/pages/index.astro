@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { professions } from '../data/professions';
+import { services } from '../data/common';
+import { withBase, formLink } from '../lib/url';
+
+// ゲートウェイページ（設計書セクション4・5）。
+// 営業側の分岐・管理用。noindex にして積極的に外部へは見せない。
+---
+
+<BaseLayout
+  title="イベント幹事サポート｜管理用ゲートウェイ"
+  description="士業団体向けイベント幹事サポートの管理用ページ。"
+  noindex={true}
+>
+  <section class="section">
+    <div class="container container-narrow">
+      <p class="gateway__badge">管理用ページ（noindex）</p>
+      <h1 class="gateway__title">イベント幹事サポート ゲートウェイ</h1>
+      <p class="gateway__note">
+        このページは営業側の分岐・管理用です。営業先には、相手の業種に合わせた個別LPのURLを直接お送りください。
+      </p>
+
+      <h2 class="gateway__subtitle">個別LP一覧</h2>
+      <ul class="gateway__list">
+        {
+          professions.map((p) => (
+            <li class="card gateway__item">
+              <div>
+                <h3 class="gateway__item-title">{p.label}向けLP</h3>
+                <code class="gateway__url">{withBase(`${p.slug}/`)}</code>
+              </div>
+              <a class="btn btn-outline" href={withBase(`${p.slug}/`)}>
+                ページを開く
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2 class="gateway__subtitle">フォーム一覧</h2>
+      <ul class="gateway__list">
+        {
+          services.map((s) => (
+            <li class="card gateway__item">
+              <div>
+                <h3 class="gateway__item-title">{s.name}</h3>
+                <code class="gateway__url">
+                  {withBase(`forms/${s.formSlug}/`)}
+                </code>
+              </div>
+              <a class="btn btn-outline" href={formLink(s.formSlug)}>
+                フォームを開く
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .gateway__badge {
+    display: inline-block;
+    background: var(--color-bg-accent);
+    color: var(--color-ink-muted);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .gateway__title {
+    margin: 0 0 12px;
+  }
+
+  .gateway__note {
+    color: var(--color-ink-soft);
+    margin-bottom: 36px;
+  }
+
+  .gateway__subtitle {
+    font-size: 1.2rem;
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-line);
+  }
+
+  .gateway__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  .gateway__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+  }
+
+  .gateway__item-title {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+  }
+
+  .gateway__url {
+    color: var(--color-ink-muted);
+    font-size: 0.85rem;
+    word-break: break-all;
+  }
+
+  @media (max-width: 560px) {
+    .gateway__item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

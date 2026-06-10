@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormShell from '../../components/form/FormShell.astro';
+import TextField from '../../components/form/TextField.astro';
+import SelectField from '../../components/form/SelectField.astro';
+import TextArea from '../../components/form/TextArea.astro';
+import CheckboxGroup from '../../components/form/CheckboxGroup.astro';
+import {
+  professionTypeOptions,
+  attendeeOptions,
+  budgetOptions,
+  venueStyleOptions,
+  equipmentOptions,
+  cateringOptions,
+} from '../../data/forms';
+---
+
+<BaseLayout title="会場選びヒアリングフォーム｜イベント幹事サポート" noindex={true}>
+  <FormShell
+    plan="venue"
+    formSlug="venue-support"
+    title="会場選びサポート"
+    intro="条件に合う会場候補を整理するためのフォームです。人数・エリア・予算・設備など、わかる範囲でご記入ください。"
+  >
+    <TextField name="name" label="お名前" required placeholder="例：山田 太郎" />
+    <TextField name="email" label="メールアドレス" type="email" required placeholder="例：taro@example.com" />
+    <TextField name="organization" label="所属団体・支部名" placeholder="例：〇〇士会 港支部" />
+    <SelectField name="profession_type" label="士業・団体種別" options={professionTypeOptions} required />
+    <TextField name="area" label="開催希望エリア" required placeholder="例：東京都港区・新橋駅周辺" />
+    <TextField name="event_date" label="開催予定日・候補日" placeholder="例：12月上旬の金曜、または未定" />
+    <SelectField name="attendees" label="想定参加人数" options={attendeeOptions} required />
+    <SelectField name="budget" label="予算感" options={budgetOptions} required />
+    <SelectField name="venue_style" label="希望形式" options={venueStyleOptions} required />
+    <CheckboxGroup name="equipment" legend="必要設備" options={equipmentOptions} columns />
+    <SelectField name="catering" label="飲食の希望" options={cateringOptions} />
+    <TextArea name="avoid" label="避けたい条件" placeholder="例：駅から遠い会場は避けたい など" />
+    <TextArea name="other" label="その他希望" placeholder="その他、会場選びのご希望があればご記入ください。" />
+  </FormShell>
+</BaseLayout>

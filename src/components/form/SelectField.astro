@@ -1,0 +1,35 @@
+---
+interface Props {
+  name: string;
+  label: string;
+  options: string[];
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+}
+
+const {
+  name,
+  label,
+  options,
+  required = false,
+  placeholder = '選択してください',
+  hint,
+} = Astro.props;
+const id = `field-${name}`;
+---
+
+<div class="field" data-field>
+  <label class="field__label" for={id}>
+    {label}
+    <span class={`field__req ${required ? 'is-required' : 'is-optional'}`}>
+      {required ? '必須' : '任意'}
+    </span>
+  </label>
+  {hint && <span class="field__hint">{hint}</span>}
+  <select id={id} name={name} required={required}>
+    <option value="">{placeholder}</option>
+    {options.map((opt) => <option value={opt}>{opt}</option>)}
+  </select>
+  <span class="field__error">選択してください。</span>
+</div>

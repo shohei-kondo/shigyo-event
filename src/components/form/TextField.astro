@@ -1,0 +1,38 @@
+---
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'date';
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+}
+
+const {
+  name,
+  label,
+  type = 'text',
+  required = false,
+  placeholder,
+  hint,
+} = Astro.props;
+const id = `field-${name}`;
+---
+
+<div class="field" data-field>
+  <label class="field__label" for={id}>
+    {label}
+    <span class={`field__req ${required ? 'is-required' : 'is-optional'}`}>
+      {required ? '必須' : '任意'}
+    </span>
+  </label>
+  {hint && <span class="field__hint">{hint}</span>}
+  <input
+    id={id}
+    name={name}
+    type={type}
+    placeholder={placeholder}
+    required={required}
+  />
+  <span class="field__error">この項目を入力してください。</span>
+</div>

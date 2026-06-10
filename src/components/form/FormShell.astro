@@ -1,0 +1,213 @@
+---
+import { brand } from '../../data/common';
+import { professions } from '../../data/professions';
+
+interface Props {
+  /** プラン識別子（hidden plan に入る） */
+  plan: string;
+  /** フォームのスラッグ（hidden form_type に入る） */
+  formSlug: string;
+  title: string;
+  intro: string;
+}
+
+const { plan, formSlug, title, intro } = Astro.props;
+
+// 流入元スラッグ -> 団体種別ラベルの対応表（profession_type の自動補完用）
+const slugToLabel = Object.fromEntries(
+  professions.map((p) => [p.slug, p.professionType])
+);
+---
+
+<section class="section">
+  <div class="container container-narrow">
+    <p class="form-shell__plan">{title}</p>
+    <h1 class="form-shell__title">{title}フォーム</h1>
+    <p class="form-shell__intro">{intro}</p>
+
+    <!--
+      送信バックエンドは未接続（初期スコープ）。
+      後で Formspree などに接続する場合は、<form> の action を送信先URLにし、
+      method="post" のまま、下のスクリプトの「スタブ送信」分岐を外す。
+    -->
+    <form
+      id="contact-form"
+      class="form"
+      method="post"
+      action="#"
+      novalidate
+      data-slug-map={JSON.stringify(slugToLabel)}
+    >
+      <input type="hidden" name="form_type" value={formSlug} />
+      <input type="hidden" name="plan" value={plan} />
+      <input type="hidden" name="source_page" value="" />
+
+      <slot />
+
+      <div class="form__actions">
+        <button type="submit" class="btn btn-primary btn-lg">送信する</button>
+        <p class="form__privacy">
+          送信いただいた内容は、ご相談対応の目的にのみ利用します。
+        </p>
+      </div>
+    </form>
+
+    <div id="form-success" class="form-success" hidden>
+      <h2 class="form-success__title">送信ありがとうございました</h2>
+      {brand.autoReply.map((line) => <p>{line}</p>)}
+      <p class="form-success__note">
+        ※ 現在このフォームは検証用のため、送信内容はまだ自動送信されません。
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .form-shell__plan {
+    display: inline-block;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .form-shell__title {
+    margin: 0 0 12px;
+    font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  }
+
+  .form-shell__intro {
+    color: var(--color-ink-soft);
+    margin-bottom: 32px;
+  }
+
+  .form__actions {
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .form__privacy {
+    color: var(--color-ink-muted);
+    font-size: 0.82rem;
+    margin: 14px 0 0;
+  }
+
+  .form-success {
+    background: var(--color-primary-soft);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    text-align: center;
+  }
+
+  .form-success__title {
+    margin: 0 0 16px;
+  }
+
+  .form-success__note {
+    color: var(--color-ink-muted);
+    font-size: 0.85rem;
+    margin-top: 16px;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const success = document.getElementById('form-success');
+
+  if (form) {
+    const params = new URLSearchParams(window.location.search);
+
+    // hidden: source_page（流入元LP）を URL クエリ from から取得。無ければ referrer。
+    const from = params.get('from') ?? '';
+    const sourceInput = form.querySelector<HTMLInputElement>(
+      'input[name="source_page"]'
+    );
+    if (sourceInput) {
+      sourceInput.value = from || document.referrer || 'direct';
+    }
+
+    // profession_type を流入元から自動補完
+    const slugMap = JSON.parse(form.dataset.slugMap ?? '{}') as Record<
+      string,
+      string
+    >;
+    const label = slugMap[from];
+    const professionSelect = form.querySelector<HTMLSelectElement>(
+      'select[name="profession_type"]'
+    );
+    if (label && professionSelect) {
+      const match = Array.from(professionSelect.options).find(
+        (o) => o.value === label
+      );
+      if (match) professionSelect.value = label;
+    }
+
+    const setError = (fieldEl: Element, hasError: boolean) => {
+      fieldEl.classList.toggle('field--error', hasError);
+    };
+
+    const validate = (): boolean => {
+      let firstInvalid: Element | null = null;
+      const fields = form.querySelectorAll<HTMLElement>('[data-field]');
+
+      fields.forEach((fieldEl) => {
+        let invalid = false;
+        const group = fieldEl.dataset.group;
+        const required = fieldEl.dataset.required === 'true';
+
+        if (group === 'checkbox' || group === 'radio') {
+          if (required) {
+            const checked = fieldEl.querySelectorAll('input:checked').length;
+            invalid = checked === 0;
+          }
+        } else {
+          const control = fieldEl.querySelector<
+            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+          >('input, select, textarea');
+          if (control && control.hasAttribute('required')) {
+            invalid = !control.value.trim();
+            if (
+              !invalid &&
+              control instanceof HTMLInputElement &&
+              control.type === 'email'
+            ) {
+              invalid = !control.checkValidity();
+            }
+          }
+        }
+
+        setError(fieldEl, invalid);
+        if (invalid && !firstInvalid) firstInvalid = fieldEl;
+      });
+
+      if (firstInvalid) {
+        (firstInvalid as HTMLElement).scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+      return !firstInvalid;
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!validate()) return;
+
+      // --- スタブ送信（バックエンド未接続） ---
+      // 接続時はこの分岐を form.submit() などに差し替える。
+      const data = Object.fromEntries(new FormData(form).entries());
+      // eslint-disable-next-line no-console
+      console.info('[stub] form submission', data);
+
+      form.hidden = true;
+      if (success) {
+        success.hidden = false;
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+</script>

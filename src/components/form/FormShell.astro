@@ -1,11 +1,12 @@
 ---
 import { brand } from '../../data/common';
 import { professions } from '../../data/professions';
+import { FORM_ENDPOINT } from '../../config';
 
 interface Props {
-  /** プラン識別子（hidden plan に入る） */
+  /** プラン識別子（payload の plan に入る） */
   plan: string;
-  /** フォームのスラッグ（hidden form_type に入る） */
+  /** フォームのスラッグ（payload の formType に入る） */
   formSlug: string;
   title: string;
   intro: string;
@@ -17,6 +18,9 @@ const { plan, formSlug, title, intro } = Astro.props;
 const slugToLabel = Object.fromEntries(
   professions.map((p) => [p.slug, p.professionType])
 );
+
+// 送信先が未設定ならスタブ動作（実送信せず確認画面のみ）
+const isStub = !FORM_ENDPOINT;
 ---
 
 <section class="section">
@@ -25,17 +29,15 @@ const slugToLabel = Object.fromEntries(
     <h1 class="form-shell__title">{title}フォーム</h1>
     <p class="form-shell__intro">{intro}</p>
 
-    <!--
-      送信バックエンドは未接続（初期スコープ）。
-      後で Formspree などに接続する場合は、<form> の action を送信先URLにし、
-      method="post" のまま、下のスクリプトの「スタブ送信」分岐を外す。
-    -->
     <form
       id="contact-form"
       class="form"
       method="post"
       action="#"
       novalidate
+      data-form-type={formSlug}
+      data-plan={plan}
+      data-form-title={title}
       data-slug-map={JSON.stringify(slugToLabel)}
     >
       <input type="hidden" name="form_type" value={formSlug} />
@@ -45,7 +47,10 @@ const slugToLabel = Object.fromEntries(
       <slot />
 
       <div class="form__actions">
-        <button type="submit" class="btn btn-primary btn-lg">送信する</button>
+        <button type="submit" id="form-submit" class="btn btn-primary btn-lg">
+          送信する
+        </button>
+        <div id="form-status" class="form-status" role="alert" hidden></div>
         <p class="form__privacy">
           送信いただいた内容は、ご相談対応の目的にのみ利用します。
         </p>
@@ -55,9 +60,13 @@ const slugToLabel = Object.fromEntries(
     <div id="form-success" class="form-success" hidden>
       <h2 class="form-success__title">送信ありがとうございました</h2>
       {brand.autoReply.map((line) => <p>{line}</p>)}
-      <p class="form-success__note">
-        ※ 現在このフォームは検証用のため、送信内容はまだ自動送信されません。
-      </p>
+      {
+        isStub && (
+          <p class="form-success__note">
+            ※ 現在このフォームは検証用のため、送信内容はまだ自動送信されません。
+          </p>
+        )
+      }
     </div>
   </div>
 </section>
@@ -115,8 +124,14 @@ const slugToLabel = Object.fromEntries(
 </style>
 
 <script>
+  import { FORM_ENDPOINT } from '../../config';
+
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
   const success = document.getElementById('form-success');
+  const statusEl = document.getElementById('form-status');
+  const submitBtn = document.getElementById(
+    'form-submit'
+  ) as HTMLButtonElement | null;
 
   if (form) {
     const params = new URLSearchParams(window.location.search);
@@ -193,20 +208,128 @@ const slugToLabel = Object.fromEntries(
       return !firstInvalid;
     };
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!validate()) return;
+    // フィールド要素からラベル文字列を取得（必須/任意バッジを除去）
+    const labelOf = (fieldEl: HTMLElement): string => {
+      const labelEl = fieldEl.querySelector('.field__label, legend');
+      if (!labelEl) return '';
+      const clone = labelEl.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('.field__req').forEach((n) => n.remove());
+      return (clone.textContent ?? '').trim();
+    };
 
-      // --- スタブ送信（バックエンド未接続） ---
-      // 接続時はこの分岐を form.submit() などに差し替える。
-      const data = Object.fromEntries(new FormData(form).entries());
-      // eslint-disable-next-line no-console
-      console.info('[stub] form submission', data);
+    // フィールド要素から入力値を取得
+    const valueOf = (fieldEl: HTMLElement): string => {
+      const group = fieldEl.dataset.group;
+      if (group === 'checkbox') {
+        return Array.from(
+          fieldEl.querySelectorAll<HTMLInputElement>('input:checked')
+        )
+          .map((i) => i.value)
+          .join(', ');
+      }
+      if (group === 'radio') {
+        const checked = fieldEl.querySelector<HTMLInputElement>('input:checked');
+        return checked ? checked.value : '';
+      }
+      const control = fieldEl.querySelector<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >('input, select, textarea');
+      return control ? control.value.trim() : '';
+    };
 
+    const buildPayload = () => {
+      const fields = Array.from(
+        form.querySelectorAll<HTMLElement>('[data-field]')
+      ).map((fieldEl) => ({ label: labelOf(fieldEl), value: valueOf(fieldEl) }));
+
+      const getByName = (name: string) =>
+        (
+          form.querySelector<
+            HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+          >(`[name="${name}"]`)?.value ?? ''
+        ).trim();
+
+      return {
+        formType: form.dataset.formType ?? '',
+        formTitle: form.dataset.formTitle ?? '',
+        plan: form.dataset.plan ?? '',
+        sourcePage: sourceInput?.value ?? '',
+        professionType: getByName('profession_type'),
+        email: getByName('email'),
+        name: getByName('name'),
+        fields,
+        submittedAt: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        monitoring: false,
+      };
+    };
+
+    const setStatus = (type: 'error' | 'sending' | '', message: string) => {
+      if (!statusEl) return;
+      if (!message) {
+        statusEl.hidden = true;
+        statusEl.className = 'form-status';
+        statusEl.textContent = '';
+        return;
+      }
+      statusEl.hidden = false;
+      statusEl.className = `form-status form-status--${type}`;
+      statusEl.textContent = message;
+    };
+
+    const showSuccess = () => {
       form.hidden = true;
       if (success) {
         success.hidden = false;
         success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('', '');
+      if (!validate()) return;
+
+      const payload = buildPayload();
+
+      // 送信先未設定: スタブ動作（実送信せず確認画面を表示）
+      if (!FORM_ENDPOINT) {
+        // eslint-disable-next-line no-console
+        console.info('[stub] form submission', payload);
+        showSuccess();
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '送信中...';
+      }
+      setStatus('sending', '送信しています。画面を閉じずにお待ちください。');
+
+      try {
+        const response = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json().catch(() => ({ ok: false }));
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || '送信に失敗しました。');
+        }
+        setStatus('', '');
+        showSuccess();
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : '送信に失敗しました。';
+        setStatus(
+          'error',
+          `送信できませんでした。時間をおいて再度お試しください。（${message}）`
+        );
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '送信する';
+        }
       }
     });
   }

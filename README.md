@@ -61,13 +61,20 @@ npm run preview  # ビルド結果をプレビュー
 
 これだけで `/shigyo-event/<slug>/` のLPが自動生成されます。
 
-## フォーム送信について（初期スコープ）
+## フォーム送信について（GAS 3点セット）
 
-現在フォームは **UIのみ** で、送信バックエンドは未接続です。
-送信するとクライアント側バリデーションののち、確認メッセージを表示します
-（実際の送信・自動返信メールは行いません）。
+フォーム送信は Google Apps Script(GAS) のWebアプリで処理し、次の3点を自動で行います。
 
-- 各フォームは hidden 項目で `source_page`（流入元LP）・`profession_type`・`plan`・`form_type` を保持します。
+1. Google スプレッドシートへ1行追記（フォーム種別ごとにシートを分割）
+2. 申込者へお礼メール（自動返信文＋入力内容のコピー）
+3. 自社（管理者）へ通知メール
+
+仕組みは「静的サイトのフォームJS → GASのWebアプリURLへ JSON を POST → GASが受信して処理」です。
+GAS は HTML を配信しません（`doGet` はヘルスチェック用JSON）。
+
+- GAS のコードと導入手順は [`gas/`](gas/) を参照（[`gas/README.md`](gas/README.md)）。
+- LP 側の送信先は [`src/config.ts`](src/config.ts) の `FORM_ENDPOINT` に GAS の exec URL を設定します。
+  - **未設定（空文字）の場合はスタブ動作**（実送信せず確認画面のみ表示）になります。
+- 各フォームは流入元・プラン・団体種別などを送信データに含めます
+  （`formType` / `plan` / `sourcePage` / `professionType` と、各入力項目をラベル付きの `fields[]` で保持）。
 - LP の各CTAは `?from=<slug>&plan=<plan>` 付きでフォームへ遷移し、流入元を引き継ぎます。
-- 送信先を接続する場合は [`src/components/form/FormShell.astro`](src/components/form/FormShell.astro)
-  の `<form action>` と、スクリプト内「スタブ送信」分岐を実サービス（Formspree 等）向けに差し替えてください。

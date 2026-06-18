@@ -21,11 +21,23 @@
 const DEFAULT_SHEET_NAME = 'responses';
 const DEFAULT_SENDER_NAME = 'イベント幹事サポート';
 
-// 申込者へのお礼メール本文（設計書セクション17 / src/data/common.ts の brand.autoReply と対応）
+// 申込者へのお礼メール本文
 const AUTO_REPLY_LINES = [
   'お問い合わせありがとうございます。',
-  '内容を確認のうえ、通常1〜2営業日以内に担当者よりご連絡いたします。',
+  '内容を確認のうえ、こちらからも一両日中にご連絡いたします。',
   '開催時期が近い場合や、お急ぎの場合は、その旨もあわせてお知らせください。',
+  '何かご不明な点等ございましたら、お気軽にご連絡ください。',
+];
+
+const AUTO_REPLY_SIGNATURE_LINES = [
+  '＊＊＊＊',
+  '株式会社COMET　代表取締役',
+  '井藤　栞　（Itou Shiori)',
+  '',
+  'Head office　愛知県名古屋市瑞穂区彌富通3-9-1-402',
+  '',
+  'TEL　　080-3924-0518',
+  'MAIL　  shiori@comet-event.com',
 ];
 
 // シート先頭に固定で並べるメタ列
@@ -269,8 +281,8 @@ function buildUserBody_(payload, mailOptions) {
       '--- ご入力内容のコピー ---',
       buildResponseSummary_(payload),
       '',
-      mailOptions.senderName || DEFAULT_SENDER_NAME,
     ])
+    .concat(AUTO_REPLY_SIGNATURE_LINES)
     .join('\n');
 }
 
@@ -288,7 +300,7 @@ function buildUserHtmlBody_(payload, mailOptions) {
     '<hr>',
     '<p><strong>ご入力内容のコピー</strong></p>',
     htmlResponseSummary_(payload),
-    `<p>${escapeHtml_(mailOptions.senderName || DEFAULT_SENDER_NAME)}</p>`,
+    `<p>${AUTO_REPLY_SIGNATURE_LINES.map(escapeHtml_).join('<br>')}</p>`,
   ].join('');
 }
 

@@ -4,7 +4,6 @@ import type { Profession } from './index';
 export const taxAccountant: Profession = {
   slug: 'tax-accountant',
   label: '税理士会',
-  professionType: '税理士会',
   title: '税理士会・支部会合の幹事業務、必要なところだけお手伝いします',
   hero: {
     headline: '税理士会・支部会合の幹事業務、必要なところだけお手伝いします',

@@ -1,16 +1,4 @@
 // フォームで使う選択肢の共通定義（設計書セクション13〜16）。
-import { professions } from './professions';
-
-/** 士業・団体種別の選択肢（個別LPに無い団体も将来の流入に備えて含める） */
-export const professionTypeOptions: string[] = [
-  '弁護士会',
-  '税理士会',
-  '社労士会',
-  '司法書士会',
-  '行政書士会',
-  '不動産鑑定士協会',
-  'その他',
-];
 
 /** 予定しているイベント種別（無料相談フォーム） */
 export const eventTypeOptions: string[] = [
@@ -51,8 +39,8 @@ export const consultTopicOptions: string[] = [
   'まず全体像を相談したい',
 ];
 
-/** 無料相談の希望方法 */
-export const consultMethodOptions: string[] = ['オンライン', '電話', '対面相談希望'];
+/** 無料相談の実施方法確認 */
+export const onlineConsultConfirmationOptions: string[] = ['オンラインのみであることを確認しました'];
 
 /** 予算感（会場選びフォーム） */
 export const budgetOptions: string[] = [
@@ -118,9 +106,3 @@ export const deliverableOptions: string[] = [
   '準備物リスト',
   '当日チェックリスト',
 ];
-
-/** 企画・ゲームの有無（台本作成フォーム） */
-export const planGameOptions: string[] = ['あり', 'なし', '検討中'];
-
-/** 個別LPのスラッグ一覧（流入元の表示などに使用） */
-export const professionSlugs: string[] = professions.map((p) => p.slug);

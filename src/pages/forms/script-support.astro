@@ -6,11 +6,9 @@ import SelectField from '../../components/form/SelectField.astro';
 import TextArea from '../../components/form/TextArea.astro';
 import CheckboxGroup from '../../components/form/CheckboxGroup.astro';
 import {
-  professionTypeOptions,
   attendeeOptions,
   programOptions,
   deliverableOptions,
-  planGameOptions,
 } from '../../data/forms';
 ---
 
@@ -24,16 +22,15 @@ import {
     <TextField name="name" label="お名前" required placeholder="例：山田 太郎" />
     <TextField name="email" label="メールアドレス" type="email" required placeholder="例：taro@example.com" />
     <TextField name="organization" label="所属団体・支部名" placeholder="例：〇〇士会 港支部" />
-    <SelectField name="profession_type" label="士業・団体種別" options={professionTypeOptions} required />
     <TextField name="event_name" label="イベント名" placeholder="例：〇〇支部 忘年会" />
     <TextField name="event_date" label="開催日" type="date" />
     <TextField name="event_time" label="開始・終了時間" required placeholder="例：18:30〜20:30" />
     <TextField name="venue" label="会場" placeholder="例：〇〇ホテル 宴会場" />
     <SelectField name="attendees" label="想定参加人数" options={attendeeOptions} required />
     <CheckboxGroup name="program" legend="入れたい進行" options={programOptions} required columns />
+    <TextField name="program_other" label="入れたい進行（その他）" placeholder="その他に入れたい進行があればご記入ください。" />
     <TextArea name="speakers" label="挨拶者・登壇者" placeholder="例：開会挨拶＝支部長、乾杯＝〇〇先生 など" />
     <TextArea name="mc" label="司会者" placeholder="例：幹事の〇〇が担当予定 など" />
-    <SelectField name="plan_game" label="企画・ゲームの有無" options={planGameOptions} />
     <CheckboxGroup name="deliverables" legend="作ってほしいもの" options={deliverableOptions} required columns />
     <TextArea name="notes" label="注意したいこと" placeholder="例：来賓の紹介順に配慮したい など" />
   </FormShell>

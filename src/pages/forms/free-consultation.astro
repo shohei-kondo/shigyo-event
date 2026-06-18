@@ -5,14 +5,12 @@ import TextField from '../../components/form/TextField.astro';
 import SelectField from '../../components/form/SelectField.astro';
 import TextArea from '../../components/form/TextArea.astro';
 import CheckboxGroup from '../../components/form/CheckboxGroup.astro';
-import RadioGroup from '../../components/form/RadioGroup.astro';
 import {
-  professionTypeOptions,
   eventTypeOptions,
   attendeeOptions,
   periodOptions,
   consultTopicOptions,
-  consultMethodOptions,
+  onlineConsultConfirmationOptions,
 } from '../../data/forms';
 ---
 
@@ -26,13 +24,12 @@ import {
     <TextField name="name" label="お名前" required placeholder="例：山田 太郎" />
     <TextField name="email" label="メールアドレス" type="email" required placeholder="例：taro@example.com" />
     <TextField name="organization" label="所属団体・支部名" placeholder="例：〇〇士会 港支部" />
-    <SelectField name="profession_type" label="士業・団体種別" options={professionTypeOptions} required />
     <SelectField name="event_type" label="予定しているイベント種別" options={eventTypeOptions} />
     <SelectField name="attendees" label="想定参加人数" options={attendeeOptions} />
     <SelectField name="period" label="開催予定時期" options={periodOptions} />
     <CheckboxGroup name="consult_topics" legend="相談したいこと" options={consultTopicOptions} required />
     <TextArea name="consult_detail" label="相談したいこと（自由記述）" placeholder="ご相談内容を自由にご記入ください。" />
-    <RadioGroup name="consult_method" legend="無料相談の希望方法" options={consultMethodOptions} required />
+    <CheckboxGroup name="consult_method" legend="無料相談の希望方法" options={onlineConsultConfirmationOptions} required />
     <TextField name="contact_time" label="希望連絡時間帯" placeholder="例：平日10〜17時" />
   </FormShell>
 </BaseLayout>

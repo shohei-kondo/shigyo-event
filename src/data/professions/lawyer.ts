@@ -4,7 +4,6 @@ import type { Profession } from './index';
 export const lawyer: Profession = {
   slug: 'lawyer',
   label: '弁護士会',
-  professionType: '弁護士会',
   title: '弁護士会・支部イベントの幹事業務、必要なところだけお手伝いします',
   hero: {
     headline: '弁護士会・支部イベントの幹事業務、必要なところだけお手伝いします',

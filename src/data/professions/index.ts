@@ -7,8 +7,6 @@ export interface Profession {
   slug: string;
   /** 団体種別の表示名（例: 弁護士会） */
   label: string;
-  /** フォームの「士業・団体種別」初期値として渡す値 */
-  professionType: string;
   /** LP・metaタイトル */
   title: string;
   /** ファーストビュー */

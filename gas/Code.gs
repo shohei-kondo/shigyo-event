@@ -90,9 +90,6 @@ function validatePayload_(payload) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(payload.email || ''))) {
     return { ok: false, error: 'メールアドレスの形式が正しくありません。' };
   }
-  if (!String(payload.professionType || '').trim()) {
-    return { ok: false, error: '士業・団体種別が未入力です。' };
-  }
   return { ok: true };
 }
 
@@ -192,7 +189,7 @@ function sendNotifications_(payload) {
     sendEmail_(
       {
         to: ownerEmail,
-        subject: `【${formTitle}】${payload.professionType || ''} / ${payload.name || ''}`,
+        subject: `【${formTitle}】${payload.name || ''}`,
         body: buildOwnerBody_(payload),
         htmlBody: buildOwnerHtmlBody_(payload),
       },

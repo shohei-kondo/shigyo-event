@@ -1,6 +1,5 @@
 ---
 import { brand } from '../../data/common';
-import { professions } from '../../data/professions';
 import { FORM_ENDPOINT } from '../../config';
 
 interface Props {
@@ -13,11 +12,6 @@ interface Props {
 }
 
 const { plan, formSlug, title, intro } = Astro.props;
-
-// 流入元スラッグ -> 団体種別ラベルの対応表（profession_type の自動補完用）
-const slugToLabel = Object.fromEntries(
-  professions.map((p) => [p.slug, p.professionType])
-);
 
 // 送信先が未設定ならスタブ動作（実送信せず確認画面のみ）
 const isStub = !FORM_ENDPOINT;
@@ -38,7 +32,6 @@ const isStub = !FORM_ENDPOINT;
       data-form-type={formSlug}
       data-plan={plan}
       data-form-title={title}
-      data-slug-map={JSON.stringify(slugToLabel)}
     >
       <input type="hidden" name="form_type" value={formSlug} />
       <input type="hidden" name="plan" value={plan} />
@@ -145,22 +138,6 @@ const isStub = !FORM_ENDPOINT;
       sourceInput.value = from || document.referrer || 'direct';
     }
 
-    // profession_type を流入元から自動補完
-    const slugMap = JSON.parse(form.dataset.slugMap ?? '{}') as Record<
-      string,
-      string
-    >;
-    const label = slugMap[from];
-    const professionSelect = form.querySelector<HTMLSelectElement>(
-      'select[name="profession_type"]'
-    );
-    if (label && professionSelect) {
-      const match = Array.from(professionSelect.options).find(
-        (o) => o.value === label
-      );
-      if (match) professionSelect.value = label;
-    }
-
     const setError = (fieldEl: Element, hasError: boolean) => {
       fieldEl.classList.toggle('field--error', hasError);
     };
@@ -254,7 +231,6 @@ const isStub = !FORM_ENDPOINT;
         formTitle: form.dataset.formTitle ?? '',
         plan: form.dataset.plan ?? '',
         sourcePage: sourceInput?.value ?? '',
-        professionType: getByName('profession_type'),
         email: getByName('email'),
         name: getByName('name'),
         fields,

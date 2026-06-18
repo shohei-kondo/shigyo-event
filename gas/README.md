@@ -82,7 +82,6 @@ export const FORM_ENDPOINT = 'https://script.google.com/macros/s/XXXXXXXX/exec';
   "formTitle": "企画の無料相談",
   "plan": "free",
   "sourcePage": "lawyer",
-  "professionType": "弁護士会",
   "email": "taro@example.com",
   "name": "山田 太郎",
   "fields": [

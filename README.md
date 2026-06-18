@@ -75,6 +75,6 @@ GAS は HTML を配信しません（`doGet` はヘルスチェック用JSON）�
 - GAS のコードと導入手順は [`gas/`](gas/) を参照（[`gas/README.md`](gas/README.md)）。
 - LP 側の送信先は [`src/config.ts`](src/config.ts) の `FORM_ENDPOINT` に GAS の exec URL を設定します。
   - **未設定（空文字）の場合はスタブ動作**（実送信せず確認画面のみ表示）になります。
-- 各フォームは流入元・プラン・団体種別などを送信データに含めます
-  （`formType` / `plan` / `sourcePage` / `professionType` と、各入力項目をラベル付きの `fields[]` で保持）。
+- 各フォームは流入元・プランなどを送信データに含めます
+  （`formType` / `plan` / `sourcePage` と、各入力項目をラベル付きの `fields[]` で保持）。
 - LP の各CTAは `?from=<slug>&plan=<plan>` 付きでフォームへ遷移し、流入元を引き継ぎます。

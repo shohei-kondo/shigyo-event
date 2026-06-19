@@ -145,6 +145,63 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     background: #f4f0ea;
   }
 
+  .codex-venue-preview {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #eef2f6;
+  }
+
+  .codex-venue-preview img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: cover;
+    filter: blur(1.2px) saturate(0.9) contrast(0.96);
+    transform: scale(1.04);
+  }
+
+  .codex-venue-preview::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(27,58,107,0.08));
+    pointer-events: none;
+  }
+
+  .codex-venue-chip {
+    position: absolute;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,0.72);
+    background: rgba(27,58,107,0.86);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+  }
+
+  .codex-venue-chip--summary {
+    left: 14px;
+    top: 14px;
+  }
+
+  .codex-venue-chip--candidate {
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .codex-venue-chip--table {
+    left: 14px;
+    bottom: 14px;
+    background: rgba(160,133,80,0.9);
+  }
+
   .codex-deliverable-body {
     padding: 18px 18px 20px;
   }
@@ -269,6 +326,374 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     text-decoration: none;
   }
 
+  .codex-hero,
+  .codex-site-header,
+  .codex-realities,
+  .codex-common-issues,
+  .codex-plan-guide {
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .codex-site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    width: 100%;
+    border-bottom: 1px solid #e3ddd4;
+    background: rgba(255, 253, 249, 0.96);
+    backdrop-filter: blur(10px);
+  }
+
+  .codex-site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 1120px;
+    min-height: 68px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .codex-site-header__brand {
+    color: #1b3a6b;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .codex-site-header__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 1px solid #1b3a6b;
+    border-radius: 4px;
+    background: #1b3a6b;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none !important;
+    white-space: nowrap;
+  }
+
+  .codex-hero {
+    padding: 84px 24px 72px;
+    background: #f7f3ec;
+  }
+
+  .codex-hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    gap: 44px;
+    align-items: center;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .codex-hero__eyebrow,
+  .codex-realities__eyebrow,
+  .codex-issues__eyebrow,
+  .codex-plan__eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    color: #a08550;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+  }
+
+  .codex-hero__title {
+    margin: 0 0 20px;
+    color: #15120f;
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(31px, 4vw, 48px);
+    line-height: 1.55;
+  }
+
+  .codex-hero__lead {
+    margin: 0 0 24px;
+    color: #3f3933;
+    font-size: 15px;
+    line-height: 2;
+  }
+
+  .codex-hero__note {
+    margin: 0 0 26px;
+    padding: 18px 20px;
+    border-left: 3px solid #a08550;
+    background: #fffdf9;
+    color: #26364f;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.9;
+  }
+
+  .codex-hero__actions,
+  .codex-plan__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .codex-hero__button,
+  .codex-plan__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 20px;
+    border: 1px solid #1b3a6b;
+    border-radius: 4px;
+    background: #1b3a6b;
+    color: #fff !important;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none !important;
+  }
+
+  .codex-hero__button--secondary {
+    background: #fff;
+    color: #1b3a6b !important;
+  }
+
+  .codex-hero__image {
+    overflow: hidden;
+    min-height: 420px;
+    border: 1px solid #dfd5c8;
+    background: #e5ded4;
+  }
+
+  .codex-hero__image img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    min-height: 420px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .codex-realities,
+  .codex-common-issues,
+  .codex-plan-guide {
+    padding: 72px 24px;
+    background: #fff;
+  }
+
+  .codex-realities {
+    background: #eeeae1;
+  }
+
+  .codex-realities__inner,
+  .codex-issues__inner,
+  .codex-plan__inner {
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .codex-realities__title,
+  .codex-issues__title,
+  .codex-plan__title {
+    margin: 0 0 28px;
+    color: #15120f;
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  .codex-realities__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .codex-reality,
+  .codex-issue,
+  .codex-plan-card {
+    border: 1px solid #e4ddd2;
+    background: #fffdf9;
+  }
+
+  .codex-reality {
+    padding: 24px 22px;
+  }
+
+  .codex-reality h3,
+  .codex-issue h3 {
+    margin: 0 0 10px;
+    color: #1b3a6b;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  .codex-reality p,
+  .codex-issue p {
+    margin: 0;
+    color: #3f3933;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .codex-issues__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .codex-issue {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 14px;
+    padding: 20px;
+  }
+
+  .codex-issue__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #f1e8d7;
+    color: #a08550;
+    font-weight: 700;
+  }
+
+  .codex-plan-guide {
+    background: #fff;
+  }
+
+  .codex-plan__lead {
+    max-width: 720px;
+    margin: -12px auto 28px;
+    color: #5a5550;
+    font-size: 14px;
+    line-height: 1.9;
+    text-align: center;
+  }
+
+  .codex-plan__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .codex-plan-card {
+    display: grid;
+    gap: 14px;
+    padding: 20px;
+    border-left: 5px solid #1b3a6b;
+  }
+
+  .codex-plan-card--free {
+    border-left-color: #2f8a62;
+  }
+
+  .codex-plan-card--venue {
+    border-left-color: #1b65a7;
+  }
+
+  .codex-plan-card--script {
+    border-left-color: #a08550;
+  }
+
+  .codex-plan-card--both {
+    border-left-color: #1b3a6b;
+  }
+
+  .codex-plan-card__problem {
+    margin: 0;
+    color: #1c1917;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.65;
+  }
+
+  .codex-plan-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .codex-plan-card__tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border: 1px solid currentColor;
+    color: #1b3a6b;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .codex-plan-card__tag--free {
+    color: #2f8a62;
+  }
+
+  .codex-plan-card__tag--venue {
+    color: #1b65a7;
+  }
+
+  .codex-plan-card__tag--script {
+    color: #8a6b2f;
+  }
+
+  .codex-plan-card__text {
+    margin: 0;
+    color: #4f4943;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .codex-plan-card__cta {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid #1b3a6b;
+    background: #1b3a6b;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none !important;
+  }
+
+  .codex-plan-card--free .codex-plan-card__cta {
+    border-color: #2f8a62;
+    background: #2f8a62;
+  }
+
+  .codex-plan-card--venue .codex-plan-card__cta {
+    border-color: #1b65a7;
+    background: #1b65a7;
+  }
+
+  .codex-plan-card--script .codex-plan-card__cta {
+    border-color: #8a6b2f;
+    background: #8a6b2f;
+  }
+
+  .codex-plan__fallback {
+    margin-top: 24px;
+    padding: 22px;
+    border: 1px solid #d8dee8;
+    background: #f7f9fc;
+    text-align: center;
+  }
+
+  .codex-plan__fallback p {
+    margin: 0 0 14px;
+    color: #3f4956;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
   section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.6)"],
   section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.65)"],
   section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.7)"],
@@ -293,6 +718,28 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
   }
 
   @media (max-width: 920px) {
+    .codex-hero__inner {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+
+    .codex-hero__image,
+    .codex-hero__image img {
+      min-height: 280px;
+    }
+
+    .codex-hero__image img {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100% !important;
+    }
+
+    .codex-realities__grid,
+    .codex-issues__grid,
+    .codex-plan__grid {
+      grid-template-columns: 1fr;
+    }
+
     .codex-deliverables-grid,
     .codex-strength-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -308,9 +755,66 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
   }
 
   @media (max-width: 560px) {
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    body img,
+    body picture,
+    body video,
+    body canvas,
+    body svg {
+      max-width: 100%;
+    }
+
+    header:not(.codex-site-header),
+    section,
+    footer {
+      max-width: 100vw;
+    }
+
+    .codex-site-header__inner {
+      min-height: 58px;
+      padding: 0 18px;
+    }
+
+    .codex-site-header__brand {
+      font-size: 13px;
+    }
+
+    .codex-site-header__cta {
+      min-height: 38px;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+
+    .codex-hero,
+    .codex-realities,
+    .codex-common-issues,
+    .codex-plan-guide,
     .codex-deliverables,
     .codex-company-about {
       padding: 54px 18px;
+    }
+
+    .codex-hero__title {
+      font-size: 28px;
+    }
+
+    .codex-hero__actions,
+    .codex-plan__actions {
+      display: grid;
+    }
+
+    .codex-hero__button,
+    .codex-plan__button,
+    .codex-plan-card__cta {
+      width: 100%;
+    }
+
+    .codex-issue {
+      grid-template-columns: 1fr;
     }
 
     .codex-deliverables-grid,
@@ -335,7 +839,55 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
       if (document.getElementById('codex-lp-runtime-style')) return;
       const style = document.createElement('style');
       style.id = 'codex-lp-runtime-style';
+      const embeddedStyles = document.getElementById('codex-lp-adjustments-style')?.textContent || '';
       style.textContent = [
+        embeddedStyles,
+        ".codex-site-header,.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
+        ".codex-site-header{position:sticky;top:0;z-index:20;width:100%;border-bottom:1px solid #e3ddd4;background:rgba(255,253,249,.96);backdrop-filter:blur(10px)}",
+        ".codex-site-header__inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1120px;min-height:68px;margin:0 auto;padding:0 24px}",
+        ".codex-site-header__brand{color:#1b3a6b;font-size:14px;font-weight:700;letter-spacing:.04em}",
+        ".codex-site-header__cta{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px;border:1px solid #1b3a6b;border-radius:4px;background:#1b3a6b;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap}",
+        ".codex-hero{padding:84px 24px 72px;background:#f7f3ec}",
+        ".codex-hero__inner{display:grid;grid-template-columns:minmax(0,.95fr) minmax(320px,1.05fr);gap:44px;align-items:center;max-width:1120px;margin:0 auto}",
+        ".codex-hero__eyebrow,.codex-realities__eyebrow,.codex-issues__eyebrow,.codex-plan__eyebrow{display:block;margin-bottom:12px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.2em}",
+        ".codex-hero__title{margin:0 0 20px;color:#15120f;font-family:'Noto Serif JP',serif;font-size:clamp(31px,4vw,48px);line-height:1.55}",
+        ".codex-hero__lead{margin:0 0 24px;color:#3f3933;font-size:15px;line-height:2}",
+        ".codex-hero__note{margin:0 0 26px;padding:18px 20px;border-left:3px solid #a08550;background:#fffdf9;color:#26364f;font-size:14px;font-weight:700;line-height:1.9}",
+        ".codex-hero__actions,.codex-plan__actions{display:flex;flex-wrap:wrap;gap:12px}",
+        ".codex-hero__button,.codex-plan__button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 20px;border:1px solid #1b3a6b;border-radius:4px;background:#1b3a6b;color:#fff!important;font-size:14px;font-weight:700;text-decoration:none!important}",
+        ".codex-hero__button--secondary{background:#fff;color:#1b3a6b!important}",
+        ".codex-hero__image{overflow:hidden;min-height:420px;border:1px solid #dfd5c8;background:#e5ded4}",
+        ".codex-hero__image img{display:block;width:100%!important;max-width:100%!important;height:100%;min-height:420px;object-fit:cover;object-position:center}",
+        ".codex-realities,.codex-common-issues,.codex-plan-guide{padding:72px 24px;background:#fff}",
+        ".codex-realities{background:#eeeae1}",
+        ".codex-realities__inner,.codex-issues__inner,.codex-plan__inner{max-width:1040px;margin:0 auto}",
+        ".codex-realities__title,.codex-issues__title,.codex-plan__title{margin:0 0 28px;color:#15120f;font-family:'Noto Serif JP',serif;font-size:clamp(24px,3vw,34px);line-height:1.6;text-align:center}",
+        ".codex-realities__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}",
+        ".codex-reality,.codex-issue,.codex-plan-card{border:1px solid #e4ddd2;background:#fffdf9}",
+        ".codex-reality{padding:24px 22px}",
+        ".codex-reality h3,.codex-issue h3{margin:0 0 10px;color:#1b3a6b;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.55}",
+        ".codex-reality p,.codex-issue p{margin:0;color:#3f3933;font-size:14px;line-height:1.9}",
+        ".codex-issues__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}",
+        ".codex-issue{display:grid;grid-template-columns:42px minmax(0,1fr);gap:14px;padding:20px}",
+        ".codex-issue__num{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#f1e8d7;color:#a08550;font-weight:700}",
+        ".codex-plan__lead{max-width:720px;margin:-12px auto 28px;color:#5a5550;font-size:14px;line-height:1.9;text-align:center}",
+        ".codex-plan__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}",
+        ".codex-plan-card{display:grid;gap:14px;padding:20px;border-left:5px solid #1b3a6b}",
+        ".codex-plan-card--free{border-left-color:#2f8a62}.codex-plan-card--venue{border-left-color:#1b65a7}.codex-plan-card--script{border-left-color:#a08550}.codex-plan-card--both{border-left-color:#1b3a6b}",
+        ".codex-plan-card__problem{margin:0;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;line-height:1.65}",
+        ".codex-plan-card__meta{display:flex;flex-wrap:wrap;gap:8px}",
+        ".codex-plan-card__tag{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border:1px solid currentColor;color:#1b3a6b;font-size:12px;font-weight:700}",
+        ".codex-plan-card__tag--free{color:#2f8a62}.codex-plan-card__tag--venue{color:#1b65a7}.codex-plan-card__tag--script{color:#8a6b2f}",
+        ".codex-plan-card__text{margin:0;color:#4f4943;font-size:13px;line-height:1.8}",
+        ".codex-plan-card__cta{justify-self:start;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border:1px solid #1b3a6b;background:#1b3a6b;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important}",
+        ".codex-plan-card--free .codex-plan-card__cta{border-color:#2f8a62;background:#2f8a62}.codex-plan-card--venue .codex-plan-card__cta{border-color:#1b65a7;background:#1b65a7}.codex-plan-card--script .codex-plan-card__cta{border-color:#8a6b2f;background:#8a6b2f}",
+        ".codex-plan__fallback{margin-top:24px;padding:22px;border:1px solid #d8dee8;background:#f7f9fc;text-align:center}.codex-plan__fallback p{margin:0 0 14px;color:#3f4956;font-size:14px;line-height:1.8}",
+        ".codex-venue-preview{position:relative;overflow:hidden;aspect-ratio:4/3;background:#eef2f6}.codex-venue-preview img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;filter:blur(1.2px) saturate(.9) contrast(.96);transform:scale(1.04)}",
+        ".codex-venue-preview:after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(27,58,107,.08));pointer-events:none}",
+        ".codex-venue-chip{position:absolute;z-index:1;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border:1px solid rgba(255,255,255,.72);background:rgba(27,58,107,.86);color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;box-shadow:0 6px 18px rgba(0,0,0,.16)}",
+        ".codex-venue-chip--summary{left:14px;top:14px}.codex-venue-chip--candidate{right:14px;top:50%;transform:translateY(-50%)}.codex-venue-chip--table{left:14px;bottom:14px;background:rgba(160,133,80,.9)}",
+        "@media(max-width:920px){.codex-hero__inner{grid-template-columns:1fr;gap:26px}.codex-hero__image,.codex-hero__image img{min-height:280px}.codex-realities__grid,.codex-issues__grid,.codex-plan__grid{grid-template-columns:1fr}}",
+        "@media(max-width:560px){html,body{overflow-x:hidden}.codex-site-header__inner{min-height:58px;padding:0 18px}.codex-site-header__brand{font-size:13px}.codex-site-header__cta{min-height:38px;padding:0 12px;font-size:12px}.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{padding:54px 18px}.codex-hero__title{font-size:28px}.codex-hero__actions,.codex-plan__actions{display:grid}.codex-hero__button,.codex-plan__button,.codex-plan-card__cta{width:100%}.codex-issue{grid-template-columns:1fr}}",
         ".codex-deliverables,.codex-company-about{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
         ".codex-deliverables,.codex-company-about{padding:72px 24px;background:#fff}",
         ".codex-section-inner{max-width:1120px;margin:0 auto}",
@@ -365,7 +917,7 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
         "section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/free-consultation/'][style*='background: rgb(255, 255, 255)']{color:#123160!important;background:#fff!important}",
         "@media(max-width:920px){.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.codex-about-panel{grid-template-columns:1fr}.codex-about-photo{max-width:260px}}",
         "@media(max-width:560px){.codex-deliverables,.codex-company-about{padding:54px 18px}.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:1fr}.codex-about-panel{padding:22px}}",
-      ].join('\\n');
+      ].filter(Boolean).join('\\n');
       document.head.appendChild(style);
     }
 
@@ -443,6 +995,28 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
       }
     }
 
+    function normalizeMobileOverflow() {
+      const viewportWidth = Math.min(window.innerWidth, document.documentElement.clientWidth || window.innerWidth);
+      if (viewportWidth > 760) return;
+      for (const image of Array.from(document.querySelectorAll('img'))) {
+        const rect = image.getBoundingClientRect();
+        if (rect.width > viewportWidth + 8 || rect.right > viewportWidth + 8 || rect.left < -8) {
+          image.style.setProperty('width', '100vw', 'important');
+          image.style.setProperty('max-width', '100vw', 'important');
+          image.style.setProperty('height', 'auto', 'important');
+          image.style.setProperty('left', '0', 'important');
+          image.style.setProperty('right', 'auto', 'important');
+          image.style.setProperty('transform', 'none', 'important');
+          image.style.setProperty('object-fit', 'cover', 'important');
+          const parent = image.parentElement;
+          if (parent) {
+            parent.style.setProperty('max-width', '100vw', 'important');
+            parent.style.setProperty('overflow', 'hidden', 'important');
+          }
+        }
+      }
+    }
+
     function sectionByText(label) {
       return Array.from(document.querySelectorAll('section')).find((section) =>
         text(section).includes(label),
@@ -453,7 +1027,239 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
       return document.querySelector('img[alt="' + alt + '"]')?.getAttribute('src') || '';
     }
 
+    function replaceHeader() {
+      if (document.querySelector('.codex-site-header')) return true;
+      const header = document.querySelector('header');
+      if (!header) return false;
+      header.outerHTML = \`
+        <header class="codex-site-header">
+          <div class="codex-site-header__inner">
+            <div class="codex-site-header__brand">イベント幹事サポート</div>
+            <a class="codex-site-header__cta" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+          </div>
+        </header>
+      \`;
+      return true;
+    }
+
+    function replaceHero() {
+      if (document.querySelector('.codex-hero')) return true;
+      const section =
+        sectionByText('なんとなく例年通り') ||
+        sectionByText('必要なところだけお手伝いします') ||
+        sectionByText('持ち回りで幹事');
+      if (!section) return false;
+      const heroImage = section.querySelector('img')?.getAttribute('src') || imageByAlt('懇親会実施例');
+
+      section.outerHTML = \`
+        <section class="codex-hero">
+          <div class="codex-hero__inner">
+            <div>
+              <span class="codex-hero__eyebrow">弁護士会・支部向け</span>
+              <h1 class="codex-hero__title">持ち回りの幹事業務、<br>“なんとなく例年通り”で<br>進めていませんか？</h1>
+              <p class="codex-hero__lead">
+                研修後の懇親会、支部総会、忘年会・新年会。先生方同士の関係づくりや支部活動への参加意欲に関わる大切な機会ですが、
+                会場選び、案内、進行、当日の確認が幹事様に集中しがちです。
+              </p>
+              <p class="codex-hero__note">
+                大がかりなイベント会社に頼むほどではない。でも、幹事だけで抱えるには少し重い。そんな幹事業務を、必要なところだけ一緒に整理します。
+              </p>
+              <div class="codex-hero__actions">
+                <a class="codex-hero__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+                <a class="codex-hero__button codex-hero__button--secondary" href="#plan-guide">プランを確認する</a>
+              </div>
+            </div>
+            \${heroImage ? \`
+              <div class="codex-hero__image">
+                <img src="\${attr(heroImage)}" alt="弁護士会・支部イベントの様子">
+              </div>
+            \` : ''}
+          </div>
+        </section>
+      \`;
+      return true;
+    }
+
+    function replaceRealities() {
+      if (document.querySelector('.codex-realities')) return true;
+      const section = sectionByText('見落としがちなこと');
+      const items = [
+        {
+          title: '会場条件の確認',
+          text: '席配置、個室・貸切、マイクや映像設備、先生方の動線まで、予約前に見ておきたい条件が意外と多くあります。',
+        },
+        {
+          title: '挨拶・進行の段取り',
+          text: '乾杯、締め、来賓挨拶、写真撮影、余興の有無など、当日になって確認が集中しやすい部分です。',
+        },
+        {
+          title: '幹事への問い合わせ集中',
+          text: '案内文、締切、出欠変更、会場への確認が幹事様に集まり、本業の合間で対応する負担が大きくなります。',
+        },
+      ];
+
+      const html = \`
+        <section class="codex-realities">
+          <div class="codex-realities__inner">
+            <span class="codex-realities__eyebrow">見落としがちなこと</span>
+            <h2 class="codex-realities__title">幹事業務は、会場を予約すれば<br>終わりではありません</h2>
+            <div class="codex-realities__grid">
+              \${items.map((item) => \`
+                <article class="codex-reality">
+                  <h3>\${item.title}</h3>
+                  <p>\${item.text}</p>
+                </article>
+              \`).join('')}
+            </div>
+          </div>
+        </section>
+      \`;
+      if (section) {
+        section.outerHTML = html;
+        return true;
+      }
+      const anchor = document.querySelector('.codex-hero');
+      if (!anchor) return false;
+      anchor.insertAdjacentHTML('afterend', html);
+      return true;
+    }
+
+    function replaceCommonIssues() {
+      if (document.querySelector('.codex-common-issues')) return true;
+      const section = sectionByText('つまずき') || sectionByText('つまづき') || sectionByText('COMMON ISSUES');
+      const issues = [
+        ['会場候補の見積条件がバラバラで、結局どこが良いのか比較しづらい'],
+        ['案内文、締切、リマインドが後回しになり、出欠確認が直前まで残る'],
+        ['乾杯、挨拶、写真撮影、締めのタイミングが当日までふわっとしている'],
+        ['会場担当者との確認事項がメールやメモに散らばり、抜け漏れが不安'],
+        ['当日の役割分担が曖昧で、幹事様に質問と判断が集中してしまう'],
+        ['例年通りのはずなのに、担当者が変わると手順が引き継がれていない'],
+      ];
+
+      const html = \`
+        <section class="codex-common-issues">
+          <div class="codex-issues__inner">
+            <span class="codex-issues__eyebrow">COMMON ISSUES</span>
+            <h2 class="codex-issues__title">弁護士会・支部イベントで、<br>幹事が地味に困ること</h2>
+            <div class="codex-issues__grid">
+              \${issues.map((issue, index) => \`
+                <article class="codex-issue">
+                  <span class="codex-issue__num">\${String(index + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3>よくある場面</h3>
+                    <p>\${issue[0]}</p>
+                  </div>
+                </article>
+              \`).join('')}
+            </div>
+          </div>
+        </section>
+      \`;
+      if (section) {
+        section.outerHTML = html;
+        return true;
+      }
+      const anchor = document.querySelector('.codex-realities') || document.querySelector('.codex-hero');
+      if (!anchor) return false;
+      anchor.insertAdjacentHTML('afterend', html);
+      return true;
+    }
+
+    function replacePlanGuide() {
+      if (document.querySelector('.codex-plan-guide')) return true;
+      const section = sectionByText('どのプランを選べばよいかわからない方へ');
+      const plans = [
+        {
+          type: 'free',
+          problem: 'まだ何も決まっていない。まず何を決めるべきか整理したい',
+          tag: '無料相談',
+          price: '0円',
+          text: '状況を伺い、会場・進行・準備物のどこから手をつけるべきか一緒に整理します。',
+          href: '/shigyo-event/forms/free-consultation/',
+          cta: '無料相談フォームへ',
+        },
+        {
+          type: 'venue',
+          problem: '会場候補を探す時間がない。条件に合う候補を並べてほしい',
+          tag: '会場選びサポート',
+          price: '2万円',
+          text: '人数、エリア、設備、雰囲気に合わせて候補を整理し、比較しやすい形で提案します。',
+          href: '/shigyo-event/forms/venue-support/',
+          cta: '会場相談フォームへ',
+        },
+        {
+          type: 'venue',
+          problem: '候補はあるが、見積や設備条件の違いを判断しきれない',
+          tag: '会場選びサポート',
+          price: '2万円',
+          text: '候補ごとの条件を揃えて、幹事会や先生方に説明しやすい比較材料に整えます。',
+          href: '/shigyo-event/forms/venue-support/',
+          cta: '会場相談フォームへ',
+        },
+        {
+          type: 'script',
+          problem: '当日の進行、挨拶、司会の段取りが直前まで曖昧になりそう',
+          tag: '進行表・台本作成',
+          price: '3万円',
+          text: '開会、乾杯、歓談、写真撮影、締めまで、当日の流れを進行表と台本に落とし込みます。',
+          href: '/shigyo-event/forms/script-support/',
+          cta: '進行相談フォームへ',
+        },
+        {
+          type: 'both',
+          problem: '会場も進行も不安。幹事業務全体を一度棚卸ししたい',
+          tag: '両方のサポート',
+          price: '5万円〜',
+          text: '会場選びと当日の段取りをまとめて確認し、必要な準備を一つずつ実務に落とします。',
+          href: '/shigyo-event/forms/free-consultation/',
+          cta: 'まとめて相談する',
+        },
+      ];
+
+      const html = \`
+        <section class="codex-plan-guide" id="plan-guide">
+          <div class="codex-plan__inner">
+            <span class="codex-plan__eyebrow">PLAN GUIDE</span>
+            <h2 class="codex-plan__title">どのプランを選べばよいか<br>わからない方へ</h2>
+            <p class="codex-plan__lead">
+              悩みの種類で見ると、2万円の会場サポートと3万円の進行サポートの違いが整理しやすくなります。
+            </p>
+            <div class="codex-plan__grid">
+              \${plans.map((plan) => \`
+                <article class="codex-plan-card codex-plan-card--\${plan.type}">
+                  <p class="codex-plan-card__problem">\${plan.problem}</p>
+                  <div class="codex-plan-card__meta">
+                    <span class="codex-plan-card__tag codex-plan-card__tag--\${plan.type}">\${plan.tag}</span>
+                    <span class="codex-plan-card__tag codex-plan-card__tag--\${plan.type}">\${plan.price}</span>
+                  </div>
+                  <p class="codex-plan-card__text">\${plan.text}</p>
+                  <a class="codex-plan-card__cta" href="\${plan.href}">\${plan.cta}</a>
+                </article>
+              \`).join('')}
+            </div>
+            <div class="codex-plan__fallback">
+              <p>迷った場合は、まず無料相談で状況を伺ったうえで、必要なサポート範囲を一緒に整理します。</p>
+              <div class="codex-plan__actions">
+                <a class="codex-plan__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      \`;
+      if (section) {
+        section.outerHTML = html;
+        return true;
+      }
+      const serviceAnchor = document.getElementById('services') || sectionByText('サービス内容と料金');
+      const fallbackAnchor = document.querySelector('.codex-common-issues') || document.querySelector('.codex-realities');
+      const anchor = serviceAnchor || fallbackAnchor;
+      if (!anchor) return false;
+      anchor.insertAdjacentHTML(serviceAnchor ? 'afterend' : 'afterend', html);
+      return true;
+    }
+
     function replaceDeliverables() {
+      if (document.querySelector('.codex-deliverables')) return true;
       const section = sectionByText('成果物のサンプル');
       if (!section) return false;
 
@@ -489,6 +1295,7 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
           title: '会場ご提案資料',
           image: custom.venueProposalDataUri,
           alt: '会場ご提案資料サンプル',
+          preview: 'venue',
           text: '条件に合わせて複数候補を比較できるよう、雰囲気・導線・設備面を資料化します。',
         },
       ];
@@ -502,7 +1309,16 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
             <div class="codex-deliverables-grid">
               \${cards.map((card) => \`
                 <article class="codex-deliverable-card">
-                  <img src="\${attr(card.image)}" alt="\${attr(card.alt)}">
+                  \${card.preview === 'venue' ? \`
+                    <div class="codex-venue-preview" aria-label="\${attr(card.alt)}">
+                      <img src="\${attr(card.image)}" alt="">
+                      <span class="codex-venue-chip codex-venue-chip--summary">候補サマリー</span>
+                      <span class="codex-venue-chip codex-venue-chip--candidate">候補 01-04</span>
+                      <span class="codex-venue-chip codex-venue-chip--table">比較表</span>
+                    </div>
+                  \` : \`
+                    <img src="\${attr(card.image)}" alt="\${attr(card.alt)}">
+                  \`}
                   <div class="codex-deliverable-body">
                     <span class="codex-deliverable-badge">\${card.badge}</span>
                     <h3 class="codex-deliverable-title">\${card.title}</h3>
@@ -518,6 +1334,7 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     }
 
     function replaceAbout() {
+      if (document.querySelector('.codex-company-about')) return true;
       const section = sectionByText('担当者について');
       if (!section) return false;
       const profileImage = document.querySelector('img[alt="担当者の写真"]')?.getAttribute('src') || '';
@@ -572,15 +1389,22 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     function apply() {
       ensureRuntimeStyles();
       if (applied) return true;
+      const headerDone = replaceHeader();
+      const heroDone = replaceHero();
+      const realitiesDone = replaceRealities();
+      const issuesDone = replaceCommonIssues();
+      const planGuideDone = replacePlanGuide();
       const deliverablesDone = replaceDeliverables();
       const aboutDone = replaceAbout();
       improveDarkContrast();
-      if (deliverablesDone && aboutDone) {
+      normalizeMobileOverflow();
+      if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone) {
         applied = true;
         [120, 500, 1200, 2500].forEach((delay) => {
           setTimeout(() => {
             ensureRuntimeStyles();
             improveDarkContrast();
+            normalizeMobileOverflow();
           }, delay);
         });
         return true;

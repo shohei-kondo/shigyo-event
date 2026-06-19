@@ -1,0 +1,7 @@
+---
+import { renderStandaloneVariant } from '../../lib/standaloneHtml';
+
+const html = await renderStandaloneVariant('v3');
+---
+
+<Fragment set:html={html} />

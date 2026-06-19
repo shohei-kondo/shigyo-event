@@ -1,0 +1,195 @@
+---
+const variants = [
+  {
+    label: 'V3 本命',
+    href: '../',
+    note: '弁護士会LPの第一候補。/lawyer/ で表示します。',
+  },
+  {
+    label: 'V2 比較対象',
+    href: '../v2/',
+    note: '比較確認用。構成・訴求の違いを見るために残します。',
+  },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>弁護士会LP A/B比較</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1f2933;
+        --muted: #62707d;
+        --line: #d8dee4;
+        --paper: #ffffff;
+        --bg: #f4f6f8;
+        --accent: #1b3a6b;
+        --accent-soft: #e8eef7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+      }
+
+      header,
+      main {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      header {
+        padding: 28px 0 18px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        line-height: 1.35;
+        letter-spacing: 0;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 16px;
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      a.button.secondary {
+        background: var(--paper);
+        color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding-bottom: 28px;
+      }
+
+      .variant {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+        overflow: hidden;
+      }
+
+      .variant__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 62px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--accent-soft);
+      }
+
+      .variant__title {
+        margin: 0 0 2px;
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      .variant__note {
+        font-size: 13px;
+      }
+
+      .variant__link {
+        flex: 0 0 auto;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        height: 760px;
+        border: 0;
+        background: #fff;
+      }
+
+      @media (max-width: 880px) {
+        header,
+        main {
+          width: min(100% - 24px, 720px);
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        iframe {
+          height: 680px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>弁護士会LP A/B比較</h1>
+      <p>
+        V3を本命として <code>/lawyer/</code> に配置し、V2は比較対象として
+        <code>/lawyer/v2/</code> に残しています。スマートフォン確認は各ページを直接開いて確認してください。
+      </p>
+      <div class="actions">
+        <a class="button" href="../">V3を開く</a>
+        <a class="button secondary" href="../v2/">V2を開く</a>
+      </div>
+    </header>
+
+    <main class="grid">
+      {
+        variants.map((variant) => (
+          <section class="variant">
+            <div class="variant__bar">
+              <div>
+                <h2 class="variant__title">{variant.label}</h2>
+                <p class="variant__note">{variant.note}</p>
+              </div>
+              <a class="variant__link" href={variant.href}>
+                開く
+              </a>
+            </div>
+            <iframe title={variant.label} src={variant.href}></iframe>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>

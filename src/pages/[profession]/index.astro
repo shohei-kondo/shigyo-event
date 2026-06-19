@@ -15,10 +15,12 @@ import { formLink } from '../../lib/url';
 // 個別LPは professions のデータから静的生成する。
 // 横展開時は src/data/professions/ にデータを追加するだけでページが増える。
 export function getStaticPaths() {
-  return professions.map((profession) => ({
-    params: { profession: profession.slug },
-    props: { profession },
-  }));
+  return professions
+    .filter((profession) => profession.slug !== 'lawyer')
+    .map((profession) => ({
+      params: { profession: profession.slug },
+      props: { profession },
+    }));
 }
 
 const { profession } = Astro.props;

@@ -39,8 +39,8 @@ export const consultTopicOptions: string[] = [
   'まず全体像を相談したい',
 ];
 
-/** 無料相談の実施方法確認 */
-export const onlineConsultConfirmationOptions: string[] = ['オンラインのみであることを確認しました'];
+/** 初回面談の実施方法確認 */
+export const onlineConsultConfirmationOptions: string[] = ['オンラインでの初回面談であることを確認しました'];
 
 /** 予算感（会場選びフォーム） */
 export const budgetOptions: string[] = [

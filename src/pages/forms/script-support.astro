@@ -9,6 +9,7 @@ import {
   attendeeOptions,
   programOptions,
   deliverableOptions,
+  onlineConsultConfirmationOptions,
 } from '../../data/forms';
 ---
 
@@ -33,5 +34,6 @@ import {
     <TextArea name="mc" label="司会者" placeholder="例：幹事の〇〇が担当予定 など" />
     <CheckboxGroup name="deliverables" legend="作ってほしいもの" options={deliverableOptions} required columns />
     <TextArea name="notes" label="注意したいこと" placeholder="例：来賓の紹介順に配慮したい など" />
+    <CheckboxGroup name="consult_method" legend="初回面談の実施方法" options={onlineConsultConfirmationOptions} required />
   </FormShell>
 </BaseLayout>

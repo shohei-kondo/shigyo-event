@@ -11,6 +11,7 @@ import {
   venueStyleOptions,
   equipmentOptions,
   cateringOptions,
+  onlineConsultConfirmationOptions,
 } from '../../data/forms';
 ---
 
@@ -33,5 +34,6 @@ import {
     <SelectField name="catering" label="飲食の希望" options={cateringOptions} />
     <TextArea name="avoid" label="避けたい条件" placeholder="例：駅から遠い会場は避けたい など" />
     <TextArea name="other" label="その他希望" placeholder="その他、会場選びのご希望があればご記入ください。" />
+    <CheckboxGroup name="consult_method" legend="初回面談の実施方法" options={onlineConsultConfirmationOptions} required />
   </FormShell>
 </BaseLayout>

@@ -526,8 +526,7 @@ function injectCommonLpAdjustments(
     padding: 24px 22px;
   }
 
-  .codex-reality h3,
-  .codex-issue h3 {
+  .codex-reality h3 {
     margin: 0 0 10px;
     color: #1b3a6b;
     font-family: 'Noto Serif JP', serif;
@@ -535,12 +534,19 @@ function injectCommonLpAdjustments(
     line-height: 1.55;
   }
 
-  .codex-reality p,
-  .codex-issue p {
+  .codex-reality p {
     margin: 0;
     color: #3f3933;
     font-size: 14px;
     line-height: 1.9;
+  }
+
+  .codex-issue p {
+    margin: 0;
+    color: #1d2638;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.85;
   }
 
   .codex-issues__grid {
@@ -978,8 +984,9 @@ function injectCommonLpAdjustments(
         ".codex-realities__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}",
         ".codex-reality,.codex-issue,.codex-plan-card{border:1px solid #e4ddd2;background:#fffdf9}",
         ".codex-reality{padding:24px 22px}",
-        ".codex-reality h3,.codex-issue h3{margin:0 0 10px;color:#1b3a6b;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.55}",
-        ".codex-reality p,.codex-issue p{margin:0;color:#3f3933;font-size:14px;line-height:1.9}",
+        ".codex-reality h3{margin:0 0 10px;color:#1b3a6b;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.55}",
+        ".codex-reality p{margin:0;color:#3f3933;font-size:14px;line-height:1.9}",
+        ".codex-issue p{margin:0;color:#1d2638;font-size:16px;font-weight:700;line-height:1.85}",
         ".codex-issues__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}",
         ".codex-issue{display:grid;grid-template-columns:42px minmax(0,1fr);gap:14px;padding:20px}",
         ".codex-issue__num{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#f1e8d7;color:#a08550;font-weight:700}",
@@ -1272,7 +1279,6 @@ function injectCommonLpAdjustments(
                 <article class="codex-issue">
                   <span class="codex-issue__num">\${String(index + 1).padStart(2, '0')}</span>
                   <div>
-                    <h3>よくある場面</h3>
                     <p>\${issue[0]}</p>
                   </div>
                 </article>

@@ -40,6 +40,7 @@ export async function renderStandaloneVariant(variantKey: VariantKey) {
   return injectCommonLpAdjustments(
     withProfileImage,
     `data:image/jpeg;base64,${venueProposalImage.toString('base64')}`,
+    variantKey,
   );
 }
 
@@ -79,8 +80,12 @@ function replaceManifestImage(
   ].join('');
 }
 
-function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
-  const payload = JSON.stringify({ venueProposalDataUri });
+function injectCommonLpAdjustments(
+  html: string,
+  venueProposalDataUri: string,
+  variantKey: VariantKey,
+) {
+  const payload = JSON.stringify({ venueProposalDataUri, variantKey });
   const injection = `
 <style id="codex-lp-adjustments-style">
   .codex-deliverables,
@@ -581,6 +586,83 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     gap: 14px;
   }
 
+  .codex-plan-table {
+    max-width: 760px;
+    margin: 0 auto;
+    border-top: 1px solid #ebe5dc;
+    background: #f7f4ef;
+  }
+
+  .codex-plan-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    align-items: center;
+    gap: 18px;
+    min-height: 66px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #ebe5dc;
+    color: #2f2a25 !important;
+    text-decoration: none !important;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .codex-plan-row:hover {
+    background: #fffdf9;
+  }
+
+  .codex-plan-row__problem {
+    color: #2f2a25;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .codex-plan-row__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid #bdd2e8;
+    background: #eef5ff;
+    color: #1b4f83;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .codex-plan-row--free .codex-plan-row__label {
+    border-color: #badccf;
+    background: #effaf5;
+    color: #22704e;
+  }
+
+  .codex-plan-row--script .codex-plan-row__label {
+    border-color: #dfcda2;
+    background: #fff8e8;
+    color: #76572a;
+  }
+
+  .codex-plan-row--both .codex-plan-row__label {
+    border-color: #1b3a6b;
+    background: #1b3a6b;
+    color: #fff;
+  }
+
+  .codex-plan__note {
+    max-width: 620px;
+    margin: 28px auto 0;
+    color: #6b6259;
+    font-size: 13px;
+    line-height: 1.9;
+    text-align: center;
+  }
+
+  .codex-plan-guide .codex-plan__actions {
+    justify-content: center;
+    margin-top: 18px;
+  }
+
   .codex-plan-card {
     display: grid;
     gap: 14px;
@@ -694,23 +776,23 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     line-height: 1.8;
   }
 
-  section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.6)"],
-  section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.65)"],
-  section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.7)"],
-  section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.72)"],
-  section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.75)"] {
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.6)"],
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.65)"],
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.7)"],
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.72)"],
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] [style*="color:rgba(255,255,255,0.75)"] {
     color: rgba(255,255,255,0.9) !important;
   }
 
-  section[style*="background:#1B3A6B"] a[href][style*="border"] {
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] a[href][style*="border"] {
     border-color: rgba(255,255,255,0.78) !important;
     background: rgba(255,255,255,0.11) !important;
     color: #fff !important;
     box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset;
   }
 
-  section[style*="background:#1B3A6B"] a[href][style*="background:#fff"],
-  section[style*="background:#1B3A6B"] a[href][style*="background: #fff"] {
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] a[href][style*="background:#fff"],
+  html.codex-lp-variant-v3 section[style*="background:#1B3A6B"] a[href][style*="background: #fff"] {
     border-color: #fff !important;
     background: #fff !important;
     color: #123160 !important;
@@ -740,6 +822,15 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
       grid-template-columns: 1fr;
     }
 
+    .codex-plan-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .codex-plan-row__label {
+      justify-self: start;
+    }
+
     .codex-deliverables-grid,
     .codex-strength-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -766,6 +857,27 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     body canvas,
     body svg {
       max-width: 100%;
+    }
+
+    body [style*="display:grid"] {
+      min-width: 0;
+    }
+
+    body [style*="grid-template-columns:repeat(2,1fr)"],
+    body [style*="grid-template-columns: repeat(2, 1fr)"],
+    body [style*="grid-template-columns:repeat(3,1fr)"],
+    body [style*="grid-template-columns: repeat(3, 1fr)"],
+    body [style*="grid-template-columns:1fr 1fr"],
+    body [style*="grid-template-columns: 1fr 1fr"],
+    body [style*="grid-template-columns:200px 1fr"],
+    body [style*="grid-template-columns: 200px 1fr"],
+    body [style*="grid-template-columns:260px"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    body a[style*="max-width:300px"] {
+      box-sizing: border-box;
+      max-width: 100% !important;
     }
 
     header:not(.codex-site-header),
@@ -830,6 +942,7 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
 <script id="codex-lp-adjustments-script">
   (() => {
     const custom = ${payload};
+    document.documentElement.classList.add('codex-lp-variant-' + custom.variantKey);
     let applied = false;
 
     const text = (node) => (node?.textContent || '').replace(/\\s+/g, ' ').trim();
@@ -872,6 +985,12 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
         ".codex-issue__num{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#f1e8d7;color:#a08550;font-weight:700}",
         ".codex-plan__lead{max-width:720px;margin:-12px auto 28px;color:#5a5550;font-size:14px;line-height:1.9;text-align:center}",
         ".codex-plan__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}",
+        ".codex-plan-table{max-width:760px;margin:0 auto;border-top:1px solid #ebe5dc;background:#f7f4ef}",
+        ".codex-plan-row{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:18px;min-height:66px;padding:14px 20px;border-bottom:1px solid #ebe5dc;color:#2f2a25!important;text-decoration:none!important;transition:background .18s ease,border-color .18s ease}.codex-plan-row:hover{background:#fffdf9}",
+        ".codex-plan-row__problem{color:#2f2a25;font-size:14px;line-height:1.65}.codex-plan-row__label{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid #bdd2e8;background:#eef5ff;color:#1b4f83;font-size:12px;font-weight:700;line-height:1.4;text-align:center}",
+        ".codex-plan-row--free .codex-plan-row__label{border-color:#badccf;background:#effaf5;color:#22704e}.codex-plan-row--script .codex-plan-row__label{border-color:#dfcda2;background:#fff8e8;color:#76572a}.codex-plan-row--both .codex-plan-row__label{border-color:#1b3a6b;background:#1b3a6b;color:#fff}",
+        ".codex-plan__note{max-width:620px;margin:28px auto 0;color:#6b6259;font-size:13px;line-height:1.9;text-align:center}",
+        ".codex-plan-guide .codex-plan__actions{justify-content:center;margin-top:18px}",
         ".codex-plan-card{display:grid;gap:14px;padding:20px;border-left:5px solid #1b3a6b}",
         ".codex-plan-card--free{border-left-color:#2f8a62}.codex-plan-card--venue{border-left-color:#1b65a7}.codex-plan-card--script{border-left-color:#a08550}.codex-plan-card--both{border-left-color:#1b3a6b}",
         ".codex-plan-card__problem{margin:0;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;line-height:1.65}",
@@ -886,7 +1005,7 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
         ".codex-venue-preview:after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(27,58,107,.08));pointer-events:none}",
         ".codex-venue-chip{position:absolute;z-index:1;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border:1px solid rgba(255,255,255,.72);background:rgba(27,58,107,.86);color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;box-shadow:0 6px 18px rgba(0,0,0,.16)}",
         ".codex-venue-chip--summary{left:14px;top:14px}.codex-venue-chip--candidate{right:14px;top:50%;transform:translateY(-50%)}.codex-venue-chip--table{left:14px;bottom:14px;background:rgba(160,133,80,.9)}",
-        "@media(max-width:920px){.codex-hero__inner{grid-template-columns:1fr;gap:26px}.codex-hero__image,.codex-hero__image img{min-height:280px}.codex-realities__grid,.codex-issues__grid,.codex-plan__grid{grid-template-columns:1fr}}",
+        "@media(max-width:920px){.codex-hero__inner{grid-template-columns:1fr;gap:26px}.codex-hero__image,.codex-hero__image img{min-height:280px}.codex-realities__grid,.codex-issues__grid,.codex-plan__grid,.codex-plan-row{grid-template-columns:1fr}.codex-plan-row{gap:10px}.codex-plan-row__label{justify-self:start}}",
         "@media(max-width:560px){html,body{overflow-x:hidden}.codex-site-header__inner{min-height:58px;padding:0 18px}.codex-site-header__brand{font-size:13px}.codex-site-header__cta{min-height:38px;padding:0 12px;font-size:12px}.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{padding:54px 18px}.codex-hero__title{font-size:28px}.codex-hero__actions,.codex-plan__actions{display:grid}.codex-hero__button,.codex-plan__button,.codex-plan-card__cta{width:100%}.codex-issue{grid-template-columns:1fr}}",
         ".codex-deliverables,.codex-company-about{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
         ".codex-deliverables,.codex-company-about{padding:72px 24px;background:#fff}",
@@ -912,10 +1031,11 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
         ".codex-strength small{display:block;margin-bottom:4px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.12em}",
         ".codex-strength p{margin:0;color:#2f2a25;font-size:13px;font-weight:700;line-height:1.7}",
         ".codex-company-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 18px;border:1px solid #1b3a6b!important;background:#1b3a6b!important;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important}",
-        "section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) p,section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) span{color:rgba(255,255,255,.9)!important}",
-        "section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/venue-support/'],section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/script-support/']{border-color:rgba(255,255,255,.82)!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset!important}",
-        "section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/free-consultation/'][style*='background: rgb(255, 255, 255)']{color:#123160!important;background:#fff!important}",
+        "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) p,html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) span{color:rgba(255,255,255,.9)!important}",
+        "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/venue-support/'],html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/script-support/']{border-color:rgba(255,255,255,.82)!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset!important}",
+        "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/free-consultation/'][style*='background: rgb(255, 255, 255)']{color:#123160!important;background:#fff!important}",
         "@media(max-width:920px){.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.codex-about-panel{grid-template-columns:1fr}.codex-about-photo{max-width:260px}}",
+        "@media(max-width:760px){body [style*='display:grid'],body [style*='display: grid']{min-width:0}body [style*='grid-template-columns:repeat(2,1fr)'],body [style*='grid-template-columns: repeat(2, 1fr)'],body [style*='grid-template-columns:repeat(3,1fr)'],body [style*='grid-template-columns: repeat(3, 1fr)'],body [style*='grid-template-columns:1fr 1fr'],body [style*='grid-template-columns: 1fr 1fr'],body [style*='grid-template-columns:200px 1fr'],body [style*='grid-template-columns: 200px 1fr'],body [style*='grid-template-columns:260px']{grid-template-columns:1fr!important}body a[style*='max-width:300px']{box-sizing:border-box;max-width:100%!important}}",
         "@media(max-width:560px){.codex-deliverables,.codex-company-about{padding:54px 18px}.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:1fr}.codex-about-panel{padding:22px}}",
       ].filter(Boolean).join('\\n');
       document.head.appendChild(style);
@@ -1013,6 +1133,12 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
             parent.style.setProperty('max-width', '100vw', 'important');
             parent.style.setProperty('overflow', 'hidden', 'important');
           }
+        }
+      }
+      for (const grid of Array.from(document.querySelectorAll('[style*="display:grid"], [style*="display: grid"]'))) {
+        const columns = getComputedStyle(grid).gridTemplateColumns;
+        if (columns && columns.split(' ').length > 1) {
+          grid.style.setProperty('grid-template-columns', '1fr', 'important');
         }
       }
     }
@@ -1171,48 +1297,39 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
       const plans = [
         {
           type: 'free',
-          problem: 'まだ何も決まっていない。まず何を決めるべきか整理したい',
-          tag: '無料相談',
-          price: '0円',
-          text: '状況を伺い、会場・進行・準備物のどこから手をつけるべきか一緒に整理します。',
+          problem: 'まだ何も決まっていない',
+          label: '無料相談',
           href: '/shigyo-event/forms/free-consultation/',
-          cta: '無料相談フォームへ',
+        },
+        {
+          type: 'free',
+          problem: '何を準備すればよいか、いったん整理したい',
+          label: '無料相談',
+          href: '/shigyo-event/forms/free-consultation/',
         },
         {
           type: 'venue',
-          problem: '会場候補を探す時間がない。条件に合う候補を並べてほしい',
-          tag: '会場選びサポート',
-          price: '2万円',
-          text: '人数、エリア、設備、雰囲気に合わせて候補を整理し、比較しやすい形で提案します。',
+          problem: '候補の探し方・比較軸から相談したい',
+          label: '会場選びサポート（2万円）',
           href: '/shigyo-event/forms/venue-support/',
-          cta: '会場相談フォームへ',
         },
         {
           type: 'venue',
-          problem: '候補はあるが、見積や設備条件の違いを判断しきれない',
-          tag: '会場選びサポート',
-          price: '2万円',
-          text: '候補ごとの条件を揃えて、幹事会や先生方に説明しやすい比較材料に整えます。',
+          problem: '会場候補はあるが、条件比較に迷っている',
+          label: '会場選びサポート（2万円）',
           href: '/shigyo-event/forms/venue-support/',
-          cta: '会場相談フォームへ',
         },
         {
           type: 'script',
-          problem: '当日の進行、挨拶、司会の段取りが直前まで曖昧になりそう',
-          tag: '進行表・台本作成',
-          price: '3万円',
-          text: '開会、乾杯、歓談、写真撮影、締めまで、当日の流れを進行表と台本に落とし込みます。',
+          problem: '当日の流れ・司会コメントを整えたい',
+          label: '進行表・台本作成（3万円）',
           href: '/shigyo-event/forms/script-support/',
-          cta: '進行相談フォームへ',
         },
         {
           type: 'both',
-          problem: '会場も進行も不安。幹事業務全体を一度棚卸ししたい',
-          tag: '両方のサポート',
-          price: '5万円〜',
-          text: '会場選びと当日の段取りをまとめて確認し、必要な準備を一つずつ実務に落とします。',
+          problem: '会場も進行も、まとめて見てほしい',
+          label: '両方のサポート（5万円〜）',
           href: '/shigyo-event/forms/free-consultation/',
-          cta: 'まとめて相談する',
         },
       ];
 
@@ -1222,26 +1339,21 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
             <span class="codex-plan__eyebrow">PLAN GUIDE</span>
             <h2 class="codex-plan__title">どのプランを選べばよいか<br>わからない方へ</h2>
             <p class="codex-plan__lead">
-              悩みの種類で見ると、2万円の会場サポートと3万円の進行サポートの違いが整理しやすくなります。
+              今の迷いに近いものを選ぶと、相談先のフォームへ進めます。
             </p>
-            <div class="codex-plan__grid">
+            <div class="codex-plan-table">
               \${plans.map((plan) => \`
-                <article class="codex-plan-card codex-plan-card--\${plan.type}">
-                  <p class="codex-plan-card__problem">\${plan.problem}</p>
-                  <div class="codex-plan-card__meta">
-                    <span class="codex-plan-card__tag codex-plan-card__tag--\${plan.type}">\${plan.tag}</span>
-                    <span class="codex-plan-card__tag codex-plan-card__tag--\${plan.type}">\${plan.price}</span>
-                  </div>
-                  <p class="codex-plan-card__text">\${plan.text}</p>
-                  <a class="codex-plan-card__cta" href="\${plan.href}">\${plan.cta}</a>
-                </article>
+                <a class="codex-plan-row codex-plan-row--\${plan.type}" href="\${plan.href}">
+                  <span class="codex-plan-row__problem">\${plan.problem}</span>
+                  <span class="codex-plan-row__label">\${plan.label}</span>
+                </a>
               \`).join('')}
             </div>
-            <div class="codex-plan__fallback">
-              <p>迷った場合は、まず無料相談で状況を伺ったうえで、必要なサポート範囲を一緒に整理します。</p>
-              <div class="codex-plan__actions">
-                <a class="codex-plan__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
-              </div>
+            <p class="codex-plan__note">
+              迷った場合は、まず無料相談で状況を伺ったうえで、必要なサポート範囲を一緒に整理します。
+            </p>
+            <div class="codex-plan__actions">
+              <a class="codex-plan__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
             </div>
           </div>
         </section>
@@ -1389,21 +1501,22 @@ function injectCommonLpAdjustments(html: string, venueProposalDataUri: string) {
     function apply() {
       ensureRuntimeStyles();
       if (applied) return true;
-      const headerDone = replaceHeader();
-      const heroDone = replaceHero();
-      const realitiesDone = replaceRealities();
-      const issuesDone = replaceCommonIssues();
-      const planGuideDone = replacePlanGuide();
-      const deliverablesDone = replaceDeliverables();
-      const aboutDone = replaceAbout();
-      improveDarkContrast();
+      const isV3 = custom.variantKey === 'v3';
+      const headerDone = isV3 ? replaceHeader() : true;
+      const heroDone = isV3 ? replaceHero() : true;
+      const realitiesDone = isV3 ? replaceRealities() : true;
+      const issuesDone = isV3 ? replaceCommonIssues() : true;
+      const planGuideDone = isV3 ? replacePlanGuide() : true;
+      const deliverablesDone = isV3 ? replaceDeliverables() : true;
+      const aboutDone = isV3 ? replaceAbout() : true;
+      if (isV3) improveDarkContrast();
       normalizeMobileOverflow();
       if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone) {
         applied = true;
         [120, 500, 1200, 2500].forEach((delay) => {
           setTimeout(() => {
             ensureRuntimeStyles();
-            improveDarkContrast();
+            if (isV3) improveDarkContrast();
             normalizeMobileOverflow();
           }, delay);
         });

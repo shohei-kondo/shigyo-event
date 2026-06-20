@@ -1273,7 +1273,7 @@ function injectCommonLpAdjustments(
         <section class="codex-common-issues">
           <div class="codex-issues__inner">
             <span class="codex-issues__eyebrow">COMMON ISSUES</span>
-            <h2 class="codex-issues__title">弁護士会・支部イベントで、<br>幹事が地味に困ること</h2>
+            <h2 class="codex-issues__title">弁護士会・支部イベントで、<br>こんなお困りごとはありませんか？</h2>
             <div class="codex-issues__grid">
               \${issues.map((issue, index) => \`
                 <article class="codex-issue">

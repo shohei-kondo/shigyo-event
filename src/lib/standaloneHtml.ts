@@ -1156,6 +1156,12 @@ function injectCommonLpAdjustments(
       );
     }
 
+    function removeRetiredSections() {
+      // 差し替え対象外で元HTMLに残る「解決のポイント」セクション（比較表含む）を削除する。
+      const section = sectionByText('解決のポイント');
+      if (section) section.remove();
+    }
+
     function imageByAlt(alt) {
       return document.querySelector('img[alt="' + alt + '"]')?.getAttribute('src') || '';
     }
@@ -1194,9 +1200,6 @@ function injectCommonLpAdjustments(
                 研修後の懇親会、支部総会、忘年会・新年会。先生方同士の関係づくりや支部活動への参加意欲に関わる大切な機会ですが、
                 会場選び、案内、進行、当日の確認が幹事様に集中しがちです。
               </p>
-              <p class="codex-hero__note">
-                大がかりなイベント会社に頼むほどではない。でも、幹事だけで抱えるには少し重い。そんな幹事業務を、必要なところだけ一緒に整理します。
-              </p>
               <div class="codex-hero__actions">
                 <a class="codex-hero__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
                 <a class="codex-hero__button codex-hero__button--secondary" href="#plan-guide">プランを確認する</a>
@@ -1214,46 +1217,10 @@ function injectCommonLpAdjustments(
     }
 
     function replaceRealities() {
-      if (document.querySelector('.codex-realities')) return true;
+      // 「見落としがちなこと」セクションは COMMON ISSUES と統合したため、
+      // 元セクションが残っていれば取り除く（重複防止）。
       const section = sectionByText('見落としがちなこと');
-      const items = [
-        {
-          title: '会場条件の確認',
-          text: '席配置、個室・貸切、マイクや映像設備、先生方の動線まで、予約前に見ておきたい条件が意外と多くあります。',
-        },
-        {
-          title: '挨拶・進行の段取り',
-          text: '乾杯、締め、来賓挨拶、写真撮影、余興の有無など、当日になって確認が集中しやすい部分です。',
-        },
-        {
-          title: '幹事への問い合わせ集中',
-          text: '案内文、締切、出欠変更、会場への確認が幹事様に集まり、本業の合間で対応する負担が大きくなります。',
-        },
-      ];
-
-      const html = \`
-        <section class="codex-realities">
-          <div class="codex-realities__inner">
-            <span class="codex-realities__eyebrow">見落としがちなこと</span>
-            <h2 class="codex-realities__title">幹事業務は、会場を予約すれば<br>終わりではありません</h2>
-            <div class="codex-realities__grid">
-              \${items.map((item) => \`
-                <article class="codex-reality">
-                  <h3>\${item.title}</h3>
-                  <p>\${item.text}</p>
-                </article>
-              \`).join('')}
-            </div>
-          </div>
-        </section>
-      \`;
-      if (section) {
-        section.outerHTML = html;
-        return true;
-      }
-      const anchor = document.querySelector('.codex-hero');
-      if (!anchor) return false;
-      anchor.insertAdjacentHTML('afterend', html);
+      if (section) section.remove();
       return true;
     }
 
@@ -1261,12 +1228,11 @@ function injectCommonLpAdjustments(
       if (document.querySelector('.codex-common-issues')) return true;
       const section = sectionByText('つまずき') || sectionByText('つまづき') || sectionByText('COMMON ISSUES');
       const issues = [
-        ['会場候補の見積条件がバラバラで、結局どこが良いのか比較しづらい'],
-        ['案内文、締切、リマインドが後回しになり、出欠確認が直前まで残る'],
-        ['乾杯、挨拶、写真撮影、締めのタイミングが当日までふわっとしている'],
-        ['会場担当者との確認事項がメールやメモに散らばり、抜け漏れが不安'],
-        ['当日の役割分担が曖昧で、幹事様に質問と判断が集中してしまう'],
-        ['例年通りのはずなのに、担当者が変わると手順が引き継がれていない'],
+        ['会場候補の比較軸がそろわず、どこが良いか決めきれない'],
+        ['案内・出欠・リマインドが後回しになり、確認が直前まで残る'],
+        ['乾杯・挨拶・締めの進行が、当日までふわっとしている'],
+        ['確認事項がメモやメールに散らばり、抜け漏れが不安'],
+        ['質問と判断が幹事に集中し、本業の合間で対応しきれない'],
       ];
 
       const html = \`
@@ -1506,6 +1472,7 @@ function injectCommonLpAdjustments(
 
     function apply() {
       ensureRuntimeStyles();
+      removeRetiredSections();
       if (applied) return true;
       const isV3 = custom.variantKey === 'v3';
       const headerDone = isV3 ? replaceHeader() : true;
@@ -1522,6 +1489,7 @@ function injectCommonLpAdjustments(
         [120, 500, 1200, 2500].forEach((delay) => {
           setTimeout(() => {
             ensureRuntimeStyles();
+            removeRetiredSections();
             if (isV3) improveDarkContrast();
             normalizeMobileOverflow();
           }, delay);

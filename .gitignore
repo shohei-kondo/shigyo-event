@@ -26,3 +26,19 @@ Thumbs.db
 *.gsheet
 *.gdoc
 *.gslides
+
+# ローカル作業用の成果物・入力素材は追跡しない。
+# ただしビルドに必要なファイルだけは除外しない（!で再包含）。
+artifact/*
+!artifact/lawyer-standalone/
+
+input/*
+!input/profile-0426cut-web.jpg
+!input/venue-proposal-sample.jpg
+!input/shigyo_event_lp_design.md
+
+# Astro 自動生成・ローカル生成物
+src/env.d.ts
+
+# ロックファイルは追跡しない方針（デプロイは npm install で実行）
+package-lock.json

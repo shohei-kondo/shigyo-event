@@ -20,6 +20,8 @@ const variants: Record<VariantKey, VariantConfig> = {
 
 const profilePhotoPath = '../../input/profile-0426cut-web.jpg';
 const venueProposalImagePath = '../../input/venue-proposal-sample.jpg';
+const LOGO_URL = '/shigyo-event/comet-logo.png';
+const LOGO_WHITE_URL = '/shigyo-event/comet-logo-white.png';
 const manifestPattern =
   /(<script type="__bundler\/manifest">\s*)([\s\S]*?)(\s*<\/script>)/;
 
@@ -38,9 +40,22 @@ export async function renderStandaloneVariant(variantKey: VariantKey) {
     profilePhoto.toString('base64'),
   );
   return injectCommonLpAdjustments(
-    withProfileImage,
+    patchBundlerShell(withProfileImage),
     `data:image/jpeg;base64,${venueProposalImage.toString('base64')}`,
     variantKey,
+  );
+}
+
+function patchBundlerShell(html: string) {
+  // ローディング画面を COMET ロゴに差し替え（シールドSVG＋「イベント幹事サポート」を廃止）。
+  const thumbnailHtml = `<div id="__bundler_thumbnail"><img src="${LOGO_WHITE_URL}" alt="COMET" style="width:min(220px,55vw);height:auto;display:block"></div>`;
+  const patched = html.replace(
+    /<div id="__bundler_thumbnail">[\s\S]*?<\/div>\s*<div id="__bundler_loading">/,
+    `${thumbnailHtml}\n  <div id="__bundler_loading">`,
+  );
+  return patched.replace(
+    '#__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }',
+    '#__bundler_thumbnail img { width: min(220px, 55vw); height: auto; }',
   );
 }
 
@@ -1322,7 +1337,7 @@ function injectCommonLpAdjustments(
         <header class="codex-site-header">
           <div class="codex-site-header__inner">
             <a class="codex-site-header__logo" href="#" aria-label="ページ先頭へ">
-              <img src="https://comet-event.co.jp/uploads/logo_02.png" alt="株式会社COMET" />
+              <img src="${LOGO_URL}" alt="株式会社COMET" />
             </a>
             <a class="codex-site-header__cta" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
           </div>
@@ -1620,7 +1635,7 @@ function injectCommonLpAdjustments(
           <div class="codex-site-footer__inner">
             <div class="codex-site-footer__top">
               <div class="codex-site-footer__brand">
-                <img class="codex-site-footer__logo" src="https://comet-event.co.jp/uploads/logo_02white.png" alt="株式会社COMET">
+                <img class="codex-site-footer__logo" src="${LOGO_WHITE_URL}" alt="株式会社COMET">
                 <div class="codex-site-footer__brand-text">
                   <span class="codex-site-footer__label">OPERATED BY</span>
                   <a class="codex-site-footer__company" href="\${aboutUrl}" target="_blank" rel="noopener noreferrer">運営会社：株式会社COMET</a>
@@ -1648,6 +1663,15 @@ function injectCommonLpAdjustments(
     }
 
     let headerScrollBound = false;
+    function hideBundlerShell() {
+      const thumb = document.getElementById('__bundler_thumbnail');
+      if (thumb) thumb.style.setProperty('display', 'none', 'important');
+      const loading = document.getElementById('__bundler_loading');
+      if (loading) loading.style.setProperty('display', 'none', 'important');
+      const err = document.getElementById('__bundler_err');
+      if (err) err.remove();
+    }
+
     function setupHeaderScroll() {
       if (headerScrollBound) return;
       const header = document.querySelector('.codex-site-header');
@@ -1664,6 +1688,7 @@ function injectCommonLpAdjustments(
     function apply() {
       ensureRuntimeStyles();
       removeRetiredSections();
+      hideBundlerShell();
       if (applied) return true;
       const isV3 = custom.variantKey === 'v3';
       const headerDone = isV3 ? replaceHeader() : true;
@@ -1683,6 +1708,7 @@ function injectCommonLpAdjustments(
           setTimeout(() => {
             ensureRuntimeStyles();
             removeRetiredSections();
+            hideBundlerShell();
             if (isV3) improveDarkContrast();
             normalizeMobileOverflow();
           }, delay);

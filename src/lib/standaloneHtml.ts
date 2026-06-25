@@ -130,8 +130,10 @@ function injectCommonLpAdjustments(
 
   .codex-deliverables-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
+    max-width: 900px;
+    margin: 0 auto;
   }
 
   .codex-deliverable-card {
@@ -148,6 +150,12 @@ function injectCommonLpAdjustments(
     object-fit: cover;
     object-position: center;
     background: #f4f0ea;
+  }
+
+  /* 進行台本・幹事メモは拡大で氏名/社名が読めるため軽くぼかす（会場ご提案資料は対象外）。 */
+  .codex-deliverable-card > img {
+    filter: blur(4px) saturate(0.88) contrast(0.92);
+    transform: scale(1.08);
   }
 
   .codex-venue-preview {
@@ -331,6 +339,93 @@ function injectCommonLpAdjustments(
     text-decoration: none;
   }
 
+  .codex-site-footer {
+    background: #15120f;
+    color: #fff;
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .codex-site-footer__inner {
+    display: grid;
+    gap: 18px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 30px 24px 26px;
+  }
+
+  .codex-site-footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .codex-site-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .codex-site-footer__logo {
+    display: block;
+    width: auto;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .codex-site-footer__label {
+    display: block;
+    margin-bottom: 4px;
+    color: #c8a86a;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  .codex-site-footer__company {
+    color: #fff !important;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-decoration: none !important;
+  }
+
+  .codex-site-footer__company:hover {
+    text-decoration: underline !important;
+  }
+
+  .codex-site-footer__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none !important;
+    white-space: nowrap;
+  }
+
+  .codex-site-footer__link:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .codex-site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.66);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
   .codex-hero,
   .codex-site-header,
   .codex-realities,
@@ -342,11 +437,16 @@ function injectCommonLpAdjustments(
   .codex-site-header {
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 50;
     width: 100%;
     border-bottom: 1px solid #e3ddd4;
     background: rgba(255, 253, 249, 0.96);
     backdrop-filter: blur(10px);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .codex-site-header.is-scrolled {
+    box-shadow: 0 6px 18px rgba(28, 25, 23, 0.1);
   }
 
   .codex-site-header__inner {
@@ -358,6 +458,28 @@ function injectCommonLpAdjustments(
     min-height: 68px;
     margin: 0 auto;
     padding: 0 24px;
+    transition: min-height 0.2s ease;
+  }
+
+  .codex-site-header.is-scrolled .codex-site-header__inner {
+    min-height: 52px;
+  }
+
+  .codex-site-header__logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  .codex-site-header__logo img {
+    display: block;
+    width: auto;
+    height: 30px;
+    transition: height 0.2s ease;
+  }
+
+  .codex-site-header.is-scrolled .codex-site-header__logo img {
+    height: 24px;
   }
 
   .codex-site-header__brand {
@@ -390,7 +512,7 @@ function injectCommonLpAdjustments(
 
   .codex-hero__inner {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
     gap: 44px;
     align-items: center;
     max-width: 1120px;
@@ -413,8 +535,12 @@ function injectCommonLpAdjustments(
     margin: 0 0 20px;
     color: #15120f;
     font-family: 'Noto Serif JP', serif;
-    font-size: clamp(31px, 4vw, 48px);
+    font-size: clamp(28px, 3.4vw, 46px);
     line-height: 1.55;
+  }
+
+  .codex-hero__title-nowrap {
+    white-space: nowrap;
   }
 
   .codex-hero__lead {
@@ -920,6 +1046,10 @@ function injectCommonLpAdjustments(
       font-size: 28px;
     }
 
+    .codex-hero__title-nowrap {
+      white-space: normal;
+    }
+
     .codex-hero__actions,
     .codex-plan__actions {
       display: grid;
@@ -962,14 +1092,20 @@ function injectCommonLpAdjustments(
       style.textContent = [
         embeddedStyles,
         ".codex-site-header,.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
-        ".codex-site-header{position:sticky;top:0;z-index:20;width:100%;border-bottom:1px solid #e3ddd4;background:rgba(255,253,249,.96);backdrop-filter:blur(10px)}",
-        ".codex-site-header__inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1120px;min-height:68px;margin:0 auto;padding:0 24px}",
+        ".codex-site-header{position:sticky;top:0;z-index:50;width:100%;border-bottom:1px solid #e3ddd4;background:rgba(255,253,249,.96);backdrop-filter:blur(10px);transition:box-shadow .2s ease}",
+        ".codex-site-header.is-scrolled{box-shadow:0 6px 18px rgba(28,25,23,.1)}",
+        ".codex-site-header__inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1120px;min-height:68px;margin:0 auto;padding:0 24px;transition:min-height .2s ease}",
+        ".codex-site-header.is-scrolled .codex-site-header__inner{min-height:52px}",
+        ".codex-site-header__logo{display:inline-flex;align-items:center;text-decoration:none}",
+        ".codex-site-header__logo img{display:block;width:auto;height:30px;transition:height .2s ease}",
+        ".codex-site-header.is-scrolled .codex-site-header__logo img{height:24px}",
         ".codex-site-header__brand{color:#1b3a6b;font-size:14px;font-weight:700;letter-spacing:.04em}",
         ".codex-site-header__cta{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 18px;border:1px solid #1b3a6b;border-radius:4px;background:#1b3a6b;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap}",
         ".codex-hero{padding:84px 24px 72px;background:#f7f3ec}",
-        ".codex-hero__inner{display:grid;grid-template-columns:minmax(0,.95fr) minmax(320px,1.05fr);gap:44px;align-items:center;max-width:1120px;margin:0 auto}",
+        ".codex-hero__inner{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:44px;align-items:center;max-width:1120px;margin:0 auto}",
         ".codex-hero__eyebrow,.codex-realities__eyebrow,.codex-issues__eyebrow,.codex-plan__eyebrow{display:block;margin-bottom:12px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.2em}",
-        ".codex-hero__title{margin:0 0 20px;color:#15120f;font-family:'Noto Serif JP',serif;font-size:clamp(31px,4vw,48px);line-height:1.55}",
+        ".codex-hero__title{margin:0 0 20px;color:#15120f;font-family:'Noto Serif JP',serif;font-size:clamp(28px,3.4vw,46px);line-height:1.55}",
+        ".codex-hero__title-nowrap{white-space:nowrap}",
         ".codex-hero__lead{margin:0 0 24px;color:#3f3933;font-size:15px;line-height:2}",
         ".codex-hero__note{margin:0 0 26px;padding:18px 20px;border-left:3px solid #a08550;background:#fffdf9;color:#26364f;font-size:14px;font-weight:700;line-height:1.9}",
         ".codex-hero__actions,.codex-plan__actions{display:flex;flex-wrap:wrap;gap:12px}",
@@ -1013,16 +1149,17 @@ function injectCommonLpAdjustments(
         ".codex-venue-chip{position:absolute;z-index:1;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border:1px solid rgba(255,255,255,.72);background:rgba(27,58,107,.86);color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;box-shadow:0 6px 18px rgba(0,0,0,.16)}",
         ".codex-venue-chip--summary{left:14px;top:14px}.codex-venue-chip--candidate{right:14px;top:50%;transform:translateY(-50%)}.codex-venue-chip--table{left:14px;bottom:14px;background:rgba(160,133,80,.9)}",
         "@media(max-width:920px){.codex-hero__inner{grid-template-columns:1fr;gap:26px}.codex-hero__image,.codex-hero__image img{min-height:280px}.codex-realities__grid,.codex-issues__grid,.codex-plan__grid,.codex-plan-row{grid-template-columns:1fr}.codex-plan-row{gap:10px}.codex-plan-row__label{justify-self:start}}",
-        "@media(max-width:560px){html,body{overflow-x:hidden}.codex-site-header__inner{min-height:58px;padding:0 18px}.codex-site-header__brand{font-size:13px}.codex-site-header__cta{min-height:38px;padding:0 12px;font-size:12px}.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{padding:54px 18px}.codex-hero__title{font-size:28px}.codex-hero__actions,.codex-plan__actions{display:grid}.codex-hero__button,.codex-plan__button,.codex-plan-card__cta{width:100%}.codex-issue{grid-template-columns:1fr}}",
+        "@media(max-width:560px){html,body{overflow-x:hidden}.codex-site-header__inner{min-height:58px;padding:0 18px}.codex-site-header__brand{font-size:13px}.codex-site-header__cta{min-height:38px;padding:0 12px;font-size:12px}.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{padding:54px 18px}.codex-hero__title{font-size:28px}.codex-hero__title-nowrap{white-space:normal}.codex-hero__actions,.codex-plan__actions{display:grid}.codex-hero__button,.codex-plan__button,.codex-plan-card__cta{width:100%}.codex-issue{grid-template-columns:1fr}}",
         ".codex-deliverables,.codex-company-about{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
         ".codex-deliverables,.codex-company-about{padding:72px 24px;background:#fff}",
         ".codex-section-inner{max-width:1120px;margin:0 auto}",
         ".codex-section-label{display:block;margin-bottom:8px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase}",
         ".codex-section-title{margin:0 0 10px;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:clamp(26px,3vw,34px);line-height:1.5}",
         ".codex-section-lead{margin:0 0 34px;color:#5a5550;font-size:15px;line-height:1.9}",
-        ".codex-deliverables-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}",
+        ".codex-deliverables-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:900px;margin:0 auto}",
         ".codex-deliverable-card{overflow:hidden;border:1px solid #e7ded2;background:#fffdf9;box-shadow:0 10px 26px rgba(28,25,23,.08)}",
         ".codex-deliverable-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center;background:#f4f0ea}",
+        ".codex-deliverable-card>img{filter:blur(4px) saturate(.88) contrast(.92);transform:scale(1.08)}",
         ".codex-deliverable-body{padding:18px 18px 20px}",
         ".codex-deliverable-badge{display:inline-block;margin-bottom:9px;color:#a08550;font-size:10px;font-weight:700;letter-spacing:.16em}",
         ".codex-deliverable-title{margin:0 0 8px;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.55}",
@@ -1038,6 +1175,17 @@ function injectCommonLpAdjustments(
         ".codex-strength small{display:block;margin-bottom:4px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.12em}",
         ".codex-strength p{margin:0;color:#2f2a25;font-size:13px;font-weight:700;line-height:1.7}",
         ".codex-company-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 18px;border:1px solid #1b3a6b!important;background:#1b3a6b!important;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important}",
+        ".codex-site-footer{background:#15120f;color:#fff;font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
+        ".codex-site-footer__inner{display:grid;gap:18px;max-width:1120px;margin:0 auto;padding:30px 24px 26px}",
+        ".codex-site-footer__top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}",
+        ".codex-site-footer__brand{display:flex;align-items:center;gap:14px;min-width:0}",
+        ".codex-site-footer__logo{display:block;width:auto;height:28px;flex-shrink:0}",
+        ".codex-site-footer__label{display:block;margin-bottom:4px;color:#c8a86a;font-size:11px;font-weight:700;letter-spacing:.16em}",
+        ".codex-site-footer__company{color:#fff!important;font-size:15px;font-weight:700;line-height:1.5;text-decoration:none!important}",
+        ".codex-site-footer__company:hover{text-decoration:underline!important}",
+        ".codex-site-footer__link{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid rgba(255,255,255,.7);border-radius:999px;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important;white-space:nowrap}",
+        ".codex-site-footer__link:hover{background:rgba(255,255,255,.1)}",
+        ".codex-site-footer__bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding-top:14px;border-top:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.66);font-size:12px;line-height:1.7}",
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) p,html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) span{color:rgba(255,255,255,.9)!important}",
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/venue-support/'],html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/script-support/']{border-color:rgba(255,255,255,.82)!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset!important}",
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/free-consultation/'][style*='background: rgb(255, 255, 255)']{color:#123160!important;background:#fff!important}",
@@ -1173,7 +1321,9 @@ function injectCommonLpAdjustments(
       header.outerHTML = \`
         <header class="codex-site-header">
           <div class="codex-site-header__inner">
-            <div class="codex-site-header__brand">イベント幹事サポート</div>
+            <a class="codex-site-header__logo" href="#" aria-label="ページ先頭へ">
+              <img src="https://comet-event.co.jp/uploads/logo_02.png" alt="株式会社COMET" />
+            </a>
             <a class="codex-site-header__cta" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
           </div>
         </header>
@@ -1195,7 +1345,7 @@ function injectCommonLpAdjustments(
           <div class="codex-hero__inner">
             <div>
               <span class="codex-hero__eyebrow">弁護士会・支部向け</span>
-              <h1 class="codex-hero__title">持ち回りの幹事業務、<br>“なんとなく例年通り”で<br>進めていませんか？</h1>
+              <h1 class="codex-hero__title">持ち回りの幹事業務、<br><span class="codex-hero__title-nowrap">“なんとなく例年通り”で</span><br>進めていませんか？</h1>
               <p class="codex-hero__lead">
                 研修後の懇親会、支部総会、忘年会・新年会。先生方同士の関係づくりや支部活動への参加意欲に関わる大切な機会ですが、
                 会場選び、案内、進行、当日の確認が幹事様に集中しがちです。
@@ -1347,25 +1497,17 @@ function injectCommonLpAdjustments(
       const section = sectionByText('成果物のサンプル');
       if (!section) return false;
 
-      const partyImage = imageByAlt('司会台本サンプル');
       const scheduleImage = imageByAlt('懇親会実施例');
       const checklistImage = imageByAlt('台本詳細サンプル');
-      if (!partyImage || !scheduleImage || !checklistImage) return false;
+      if (!scheduleImage || !checklistImage) return false;
 
       const cards = [
         {
-          badge: '実施例',
-          title: 'サポートした懇親会の様子',
-          image: partyImage,
-          alt: 'サポートした懇親会の様子',
-          text: '進行・映像・会場の空気感まで含めて、当日の場づくりを支援した実施例です。',
-        },
-        {
           badge: 'SAMPLE',
-          title: '進行表スライド',
+          title: '進行台本',
           image: scheduleImage,
-          alt: '進行表スライドサンプル',
-          text: '司会・音響・映像の動きが同時に確認できる進行表。関係者間の認識合わせに使えます。',
+          alt: '進行台本サンプル',
+          text: '司会・音響・映像の動きが同時に確認できる進行台本。関係者間の認識合わせに使えます。',
         },
         {
           badge: 'SAMPLE',
@@ -1470,6 +1612,55 @@ function injectCommonLpAdjustments(
       return true;
     }
 
+    function replaceFooter() {
+      if (document.querySelector('.codex-site-footer')) return true;
+      const aboutUrl = 'https://comet-event.co.jp/about/';
+      const markup = \`
+        <footer class="codex-site-footer">
+          <div class="codex-site-footer__inner">
+            <div class="codex-site-footer__top">
+              <div class="codex-site-footer__brand">
+                <img class="codex-site-footer__logo" src="https://comet-event.co.jp/uploads/logo_02white.png" alt="株式会社COMET">
+                <div class="codex-site-footer__brand-text">
+                  <span class="codex-site-footer__label">OPERATED BY</span>
+                  <a class="codex-site-footer__company" href="\${aboutUrl}" target="_blank" rel="noopener noreferrer">運営会社：株式会社COMET</a>
+                </div>
+              </div>
+              <a class="codex-site-footer__link" href="\${aboutUrl}" target="_blank" rel="noopener noreferrer">
+                会社概要を見る <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <div class="codex-site-footer__bottom">
+              <span>社内イベントを、組織を動かす設計へ。</span>
+              <span>© 2026 名古屋のイベント業なら株式会社COMET ALL RIGHTS RESERVED.</span>
+            </div>
+          </div>
+        </footer>
+      \`;
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.outerHTML = markup;
+      } else {
+        // 元HTMLに footer が無い場合は本文末尾に追加する。
+        document.body.insertAdjacentHTML('beforeend', markup);
+      }
+      return true;
+    }
+
+    let headerScrollBound = false;
+    function setupHeaderScroll() {
+      if (headerScrollBound) return;
+      const header = document.querySelector('.codex-site-header');
+      if (!header) return;
+      headerScrollBound = true;
+      const onScroll = () => {
+        const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        header.classList.toggle('is-scrolled', y > 12);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
     function apply() {
       ensureRuntimeStyles();
       removeRetiredSections();
@@ -1482,9 +1673,11 @@ function injectCommonLpAdjustments(
       const planGuideDone = isV3 ? replacePlanGuide() : true;
       const deliverablesDone = isV3 ? replaceDeliverables() : true;
       const aboutDone = isV3 ? replaceAbout() : true;
+      const footerDone = isV3 ? replaceFooter() : true;
+      if (isV3) setupHeaderScroll();
       if (isV3) improveDarkContrast();
       normalizeMobileOverflow();
-      if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone) {
+      if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone && footerDone) {
         applied = true;
         [120, 500, 1200, 2500].forEach((delay) => {
           setTimeout(() => {

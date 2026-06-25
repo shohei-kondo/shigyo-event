@@ -450,14 +450,20 @@ function injectCommonLpAdjustments(
   }
 
   .codex-site-header {
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 50;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     width: 100%;
     border-bottom: 1px solid #e3ddd4;
     background: rgba(255, 253, 249, 0.96);
     backdrop-filter: blur(10px);
     transition: box-shadow 0.2s ease;
+  }
+
+  body.codex-has-fixed-header {
+    padding-top: var(--codex-header-height, 68px);
   }
 
   .codex-site-header.is-scrolled {
@@ -1107,7 +1113,8 @@ function injectCommonLpAdjustments(
       style.textContent = [
         embeddedStyles,
         ".codex-site-header,.codex-hero,.codex-realities,.codex-common-issues,.codex-plan-guide{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
-        ".codex-site-header{position:sticky;top:0;z-index:50;width:100%;border-bottom:1px solid #e3ddd4;background:rgba(255,253,249,.96);backdrop-filter:blur(10px);transition:box-shadow .2s ease}",
+        ".codex-site-header{position:fixed;top:0;left:0;right:0;z-index:1000;width:100%;border-bottom:1px solid #e3ddd4;background:rgba(255,253,249,.96);backdrop-filter:blur(10px);transition:box-shadow .2s ease}",
+        "body.codex-has-fixed-header{padding-top:var(--codex-header-height,68px)}",
         ".codex-site-header.is-scrolled{box-shadow:0 6px 18px rgba(28,25,23,.1)}",
         ".codex-site-header__inner{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:1120px;min-height:68px;margin:0 auto;padding:0 24px;transition:min-height .2s ease}",
         ".codex-site-header.is-scrolled .codex-site-header__inner{min-height:52px}",
@@ -1677,11 +1684,27 @@ function injectCommonLpAdjustments(
       const header = document.querySelector('.codex-site-header');
       if (!header) return;
       headerScrollBound = true;
+
+      // bundle 内の overflow 親要素では sticky が効かないため、body 直下へ移して fixed 固定する。
+      if (header.parentElement !== document.body) {
+        document.body.insertBefore(header, document.body.firstChild);
+      }
+      document.body.classList.add('codex-has-fixed-header');
+
+      const syncHeaderOffset = () => {
+        const height = Math.ceil(header.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--codex-header-height', height + 'px');
+        document.body.style.paddingTop = height + 'px';
+      };
+
       const onScroll = () => {
         const y = window.pageYOffset || document.documentElement.scrollTop || 0;
         header.classList.toggle('is-scrolled', y > 12);
+        syncHeaderOffset();
       };
+
       window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', syncHeaderOffset, { passive: true });
       onScroll();
     }
 
@@ -1689,8 +1712,9 @@ function injectCommonLpAdjustments(
       ensureRuntimeStyles();
       removeRetiredSections();
       hideBundlerShell();
-      if (applied) return true;
       const isV3 = custom.variantKey === 'v3';
+      if (isV3) setupHeaderScroll();
+      if (applied) return true;
       const headerDone = isV3 ? replaceHeader() : true;
       const heroDone = isV3 ? replaceHero() : true;
       const realitiesDone = isV3 ? replaceRealities() : true;
@@ -1699,7 +1723,6 @@ function injectCommonLpAdjustments(
       const deliverablesDone = isV3 ? replaceDeliverables() : true;
       const aboutDone = isV3 ? replaceAbout() : true;
       const footerDone = isV3 ? replaceFooter() : true;
-      if (isV3) setupHeaderScroll();
       if (isV3) improveDarkContrast();
       normalizeMobileOverflow();
       if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone && footerDone) {

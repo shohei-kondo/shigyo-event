@@ -19,18 +19,19 @@ const variants: Record<VariantKey, VariantConfig> = {
 };
 
 const profilePhotoPath = '../../input/profile-0426cut-web.jpg';
-const venueProposalImagePath = '../../input/venue-proposal-sample.jpg';
 const LOGO_URL = '/shigyo-event/comet-logo.png';
 const LOGO_WHITE_URL = '/shigyo-event/comet-logo-white.png';
+const DAIHON_GIF_URL = '/shigyo-event/daihon.gif';
+const CHECKLIST_GIF_URL = '/shigyo-event/checklist.gif';
+const KAIJO_GIF_URL = '/shigyo-event/kaijyo.gif';
 const manifestPattern =
   /(<script type="__bundler\/manifest">\s*)([\s\S]*?)(\s*<\/script>)/;
 
 export async function renderStandaloneVariant(variantKey: VariantKey) {
   const variant = variants[variantKey];
-  const [html, profilePhoto, venueProposalImage] = await Promise.all([
+  const [html, profilePhoto] = await Promise.all([
     readFile(new URL(variant.sourcePath, import.meta.url), 'utf8'),
     readFile(new URL(profilePhotoPath, import.meta.url)),
-    readFile(new URL(venueProposalImagePath, import.meta.url)),
   ]);
 
   const withProfileImage = replaceManifestImage(
@@ -39,11 +40,7 @@ export async function renderStandaloneVariant(variantKey: VariantKey) {
     'image/jpeg',
     profilePhoto.toString('base64'),
   );
-  return injectCommonLpAdjustments(
-    patchBundlerShell(withProfileImage),
-    `data:image/jpeg;base64,${venueProposalImage.toString('base64')}`,
-    variantKey,
-  );
+  return injectCommonLpAdjustments(patchBundlerShell(withProfileImage), variantKey);
 }
 
 function patchBundlerShell(html: string) {
@@ -95,12 +92,15 @@ function replaceManifestImage(
   ].join('');
 }
 
-function injectCommonLpAdjustments(
-  html: string,
-  venueProposalDataUri: string,
-  variantKey: VariantKey,
-) {
-  const payload = JSON.stringify({ venueProposalDataUri, variantKey });
+function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
+  const payload = JSON.stringify({
+    variantKey,
+    deliverables: {
+      daihon: DAIHON_GIF_URL,
+      checklist: CHECKLIST_GIF_URL,
+      venue: KAIJO_GIF_URL,
+    },
+  });
   const injection = `
 <style id="codex-lp-adjustments-style">
   .codex-deliverables,
@@ -167,10 +167,12 @@ function injectCommonLpAdjustments(
     background: #f4f0ea;
   }
 
-  /* 進行台本・幹事メモは拡大で氏名/社名が読めるため軽くぼかす（会場ご提案資料は対象外）。 */
+  /* 進行台本・幹事メモは旧サンプル向けにぼかしを入れていたが、GIF差し替え後は鮮明に表示する。 */
   .codex-deliverable-card > img {
-    filter: blur(4px) saturate(0.88) contrast(0.92);
-    transform: scale(1.08);
+    filter: none;
+    transform: none;
+    object-fit: contain;
+    background: #f4f0ea;
   }
 
   .codex-venue-preview {
@@ -310,34 +312,47 @@ function injectCommonLpAdjustments(
     line-height: 1.9;
   }
 
-  .codex-strength-grid {
+  .codex-reasons-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 0 0 22px;
+    gap: 14px;
+    margin: 28px 0 24px;
   }
 
-  .codex-strength {
-    padding: 14px 16px;
+  .codex-reason-card {
+    padding: 18px 18px 20px;
     border-left: 3px solid #a08550;
     background: #f8f4ee;
   }
 
-  .codex-strength small {
+  .codex-reason-card small {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     color: #a08550;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.12em;
   }
 
-  .codex-strength p {
-    margin: 0;
-    color: #2f2a25;
-    font-size: 13px;
+  .codex-reason-title {
+    margin: 0 0 10px;
+    color: #1c1917;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
     font-weight: 700;
-    line-height: 1.7;
+    line-height: 1.65;
+  }
+
+  .codex-reason-text {
+    margin: 0;
+    color: #4f4943;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.85;
+  }
+
+  .codex-about-actions {
+    margin-top: 4px;
   }
 
   .codex-company-link {
@@ -985,7 +1000,7 @@ function injectCommonLpAdjustments(
     }
 
     .codex-deliverables-grid,
-    .codex-strength-grid {
+    .codex-reasons-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -1087,7 +1102,7 @@ function injectCommonLpAdjustments(
     }
 
     .codex-deliverables-grid,
-    .codex-strength-grid {
+    .codex-reasons-grid {
       grid-template-columns: 1fr;
     }
 
@@ -1181,7 +1196,7 @@ function injectCommonLpAdjustments(
         ".codex-deliverables-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:900px;margin:0 auto}",
         ".codex-deliverable-card{overflow:hidden;border:1px solid #e7ded2;background:#fffdf9;box-shadow:0 10px 26px rgba(28,25,23,.08)}",
         ".codex-deliverable-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center;background:#f4f0ea}",
-        ".codex-deliverable-card>img{filter:blur(4px) saturate(.88) contrast(.92);transform:scale(1.08)}",
+        ".codex-deliverable-card>img{filter:none;transform:none;object-fit:contain;background:#f4f0ea}",
         ".codex-deliverable-body{padding:18px 18px 20px}",
         ".codex-deliverable-badge{display:inline-block;margin-bottom:9px;color:#a08550;font-size:10px;font-weight:700;letter-spacing:.16em}",
         ".codex-deliverable-title{margin:0 0 8px;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:17px;line-height:1.55}",
@@ -1192,10 +1207,12 @@ function injectCommonLpAdjustments(
         ".codex-about-role{margin:0 0 4px;color:#a08550;font-size:12px;font-weight:700;letter-spacing:.12em}",
         ".codex-about-name{margin:0 0 18px;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:24px;line-height:1.5}",
         ".codex-about-text{margin:0 0 22px;color:#4f4943;font-size:14px;line-height:1.9}",
-        ".codex-strength-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 22px}",
-        ".codex-strength{padding:14px 16px;border-left:3px solid #a08550;background:#f8f4ee}",
-        ".codex-strength small{display:block;margin-bottom:4px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.12em}",
-        ".codex-strength p{margin:0;color:#2f2a25;font-size:13px;font-weight:700;line-height:1.7}",
+        ".codex-reasons-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:28px 0 24px}",
+        ".codex-reason-card{padding:18px 18px 20px;border-left:3px solid #a08550;background:#f8f4ee}",
+        ".codex-reason-card small{display:block;margin-bottom:8px;color:#a08550;font-size:11px;font-weight:700;letter-spacing:.12em}",
+        ".codex-reason-title{margin:0 0 10px;color:#1c1917;font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;line-height:1.65}",
+        ".codex-reason-text{margin:0;color:#4f4943;font-size:13px;font-weight:400;line-height:1.85}",
+        ".codex-about-actions{margin-top:4px}",
         ".codex-company-link{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 18px;border:1px solid #1b3a6b!important;background:#1b3a6b!important;color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important}",
         ".codex-site-footer{background:#15120f;color:#fff;font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif}",
         ".codex-site-footer__inner{display:grid;gap:18px;max-width:1120px;margin:0 auto;padding:30px 24px 26px}",
@@ -1211,9 +1228,9 @@ function injectCommonLpAdjustments(
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) p,html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)']:has(a[href*='/forms/free-consultation/']) span{color:rgba(255,255,255,.9)!important}",
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/venue-support/'],html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/script-support/']{border-color:rgba(255,255,255,.82)!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-weight:700!important;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset!important}",
         "html.codex-lp-variant-v3 section[style*='background: rgb(27, 58, 107)'] a[href*='/forms/free-consultation/'][style*='background: rgb(255, 255, 255)']{color:#123160!important;background:#fff!important}",
-        "@media(max-width:920px){.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.codex-about-panel{grid-template-columns:1fr}.codex-about-photo{max-width:260px}}",
+        "@media(max-width:920px){.codex-deliverables-grid,.codex-reasons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.codex-about-panel{grid-template-columns:1fr}.codex-about-photo{max-width:260px}}",
         "@media(max-width:760px){body [style*='display:grid'],body [style*='display: grid']{min-width:0}body [style*='grid-template-columns:repeat(2,1fr)'],body [style*='grid-template-columns: repeat(2, 1fr)'],body [style*='grid-template-columns:repeat(3,1fr)'],body [style*='grid-template-columns: repeat(3, 1fr)'],body [style*='grid-template-columns:1fr 1fr'],body [style*='grid-template-columns: 1fr 1fr'],body [style*='grid-template-columns:200px 1fr'],body [style*='grid-template-columns: 200px 1fr'],body [style*='grid-template-columns:260px']{grid-template-columns:1fr!important}body a[style*='max-width:300px']{box-sizing:border-box;max-width:100%!important}}",
-        "@media(max-width:560px){.codex-deliverables,.codex-company-about{padding:54px 18px}.codex-deliverables-grid,.codex-strength-grid{grid-template-columns:1fr}.codex-about-panel{padding:22px}}",
+        "@media(max-width:560px){.codex-deliverables,.codex-company-about{padding:54px 18px}.codex-deliverables-grid,.codex-reasons-grid{grid-template-columns:1fr}.codex-about-panel{padding:22px}}",
       ].filter(Boolean).join('\\n');
       document.head.appendChild(style);
     }
@@ -1519,31 +1536,26 @@ function injectCommonLpAdjustments(
       const section = sectionByText('成果物のサンプル');
       if (!section) return false;
 
-      const scheduleImage = imageByAlt('懇親会実施例');
-      const checklistImage = imageByAlt('台本詳細サンプル');
-      if (!scheduleImage || !checklistImage) return false;
-
       const cards = [
         {
           badge: 'SAMPLE',
           title: '進行台本',
-          image: scheduleImage,
+          image: custom.deliverables.daihon,
           alt: '進行台本サンプル',
           text: '司会・音響・映像の動きが同時に確認できる進行台本。関係者間の認識合わせに使えます。',
         },
         {
           badge: 'SAMPLE',
           title: '幹事メモ・<br>当日チェックリスト',
-          image: checklistImage,
+          image: custom.deliverables.checklist,
           alt: '幹事メモ・当日チェックリストサンプル',
           text: '当日確認すべき事項や、抜け漏れを防ぐためのメモを実務向けに整理します。',
         },
         {
           badge: 'SAMPLE',
           title: '会場ご提案資料',
-          image: custom.venueProposalDataUri,
+          image: custom.deliverables.venue,
           alt: '会場ご提案資料サンプル',
-          preview: 'venue',
           text: '条件に合わせて複数候補を比較できるよう、雰囲気・導線・設備面を資料化します。',
         },
       ];
@@ -1557,16 +1569,7 @@ function injectCommonLpAdjustments(
             <div class="codex-deliverables-grid">
               \${cards.map((card) => \`
                 <article class="codex-deliverable-card">
-                  \${card.preview === 'venue' ? \`
-                    <div class="codex-venue-preview" aria-label="\${attr(card.alt)}">
-                      <img src="\${attr(card.image)}" alt="">
-                      <span class="codex-venue-chip codex-venue-chip--summary">候補サマリー</span>
-                      <span class="codex-venue-chip codex-venue-chip--candidate">候補 01-04</span>
-                      <span class="codex-venue-chip codex-venue-chip--table">比較表</span>
-                    </div>
-                  \` : \`
-                    <img src="\${attr(card.image)}" alt="\${attr(card.alt)}">
-                  \`}
+                  <img src="\${attr(card.image)}" alt="\${attr(card.alt)}">
                   <div class="codex-deliverable-body">
                     <span class="codex-deliverable-badge">\${card.badge}</span>
                     <h3 class="codex-deliverable-title">\${card.title}</h3>
@@ -1588,11 +1591,27 @@ function injectCommonLpAdjustments(
       const profileImage = document.querySelector('img[alt="担当者の写真"]')?.getAttribute('src') || '';
       if (!profileImage) return false;
 
-      const strengths = [
-        '企画立案から会場選び、当日の進行管理まで一貫して見られる',
-        '士業団体の空気感に合わせ、失礼のない段取りを設計できる',
-        '事前準備と当日の柔軟な対応で、幹事様の負担を軽くできる',
-        '会場提案・進行表・チェックリストなど実務資料まで整えられる',
+      const reasons = [
+        {
+          label: '選ばれる理由①',
+          title: 'はじめてのイベント担当でも安心の、分かりやすいサポート',
+          body: 'イベント開催が初めての幹事様・事務局様にも安心してご依頼いただけるよう、準備の流れや必要な作業を丁寧に整理しながら進行します。「何から始めればいいか分からない」という段階からでも、分かりやすく伴走いたします。',
+        },
+        {
+          label: '選ばれる理由②',
+          title: '豊富な現場経験に基づく、安定した準備とスムーズな当日運営',
+          body: '数多くのイベント運営で培った知識と経験をもとに、事前準備から当日の進行管理までしっかりサポート。受付、誘導、進行、登壇者対応など、細かな段取りを整えることで、主催者様が安心して本番を迎えられる体制をつくります。',
+        },
+        {
+          label: '選ばれる理由③',
+          title: '“お願いしたいところだけ”依頼できる、柔軟なサポート体制',
+          body: '企画から丸ごと依頼するだけでなく、受付まわり、当日運営、進行台本作成、事務局サポートなど、必要な部分だけのご依頼も可能です。ご予算や社内承認の状況に合わせて、無理のない形でイベント開催をサポートします。',
+        },
+        {
+          label: '選ばれる理由④',
+          title: 'イベントを「開催して終わり」にしない、次につながる設計',
+          body: 'セミナー、勉強会、相談会、交流会などは、当日を無事に終えることだけが目的ではありません。参加者満足度を高め、次回参加・個別相談・関係構築につながるよう、受付対応、進行、アンケート、導線づくりまで意識した運営をご提案します。',
+        },
       ];
 
       section.outerHTML = \`
@@ -1602,31 +1621,38 @@ function injectCommonLpAdjustments(
             <h2 class="codex-section-title">会社の代表について</h2>
             <div class="codex-about-panel">
               <div class="codex-about-photo">
-                <img src="\${attr(profileImage)}" alt="株式会社COMET 代表の写真">
+                <img src="\${attr(profileImage)}" alt="井藤　栞の写真">
               </div>
               <div>
-                <p class="codex-about-role">株式会社COMET 代表取締役</p>
-                <h3 class="codex-about-name">塩﨑 栞</h3>
+                <p class="codex-about-role">株式会社COMET　代表取締役</p>
+                <h3 class="codex-about-name">井藤　栞</h3>
                 <p class="codex-about-text">
-                  COMETは、イベントの企画立案から会場選び、当日の進行管理まで、イベントに関わる過程を幅広く支援する会社です。
-                  弁護士会・支部の懇親会でも、先生方に失礼のない進行と、幹事様が抱え込みすぎない段取りを大切にしています。
+                  私たちはイベントを通じて「人生を豊かにする"きっかけ"」づくりを行っています。
                 </p>
-                <div class="codex-strength-grid">
-                  \${strengths.map((strength, index) => \`
-                    <div class="codex-strength">
-                      <small>強み \${String(index + 1).padStart(2, '0')}</small>
-                      <p>\${strength}</p>
-                    </div>
-                  \`).join('')}
-                </div>
                 <p class="codex-about-text">
-                  企業の周年パーティーから各種イベントまで、企画・演出・進行管理を手がけてきた実務経験をもとに、
-                  必要な部分だけを相談できる外部パートナーとしてサポートします。
+                  今まで、過去に300名以上をお招きする弁護士会様のセミナー運営や、某省の大臣や国会議員をお招きしたVIP対応を含む医師会様のお集まり等、数多くの士業の皆さまのイベントをお手伝いしてきました。
                 </p>
-                <a class="codex-company-link" href="https://comet-event.co.jp/about/" target="_blank" rel="noopener noreferrer">
-                  会社概要を見る
-                </a>
+                <p class="codex-about-text">
+                  普段の業務もお忙しいなか、一生懸命にイベントのご準備をされる事務局の皆さまや幹事の皆さまの姿に心打たれ「もっと皆さまのお力になることができないか？」、そう考えこのサービスを展開させていただくことを決めました。
+                </p>
+                <p class="codex-about-text">
+                  ぜひ気軽な相談からで大歓迎ですし、いつかは「イベントで困ったらCOMET！」と皆様に覚えていただけるような存在になれたら嬉しいなと思っています。
+                </p>
               </div>
+            </div>
+            <div class="codex-reasons-grid">
+              \${reasons.map((reason) => \`
+                <article class="codex-reason-card">
+                  <small>\${reason.label}</small>
+                  <h4 class="codex-reason-title">\${reason.title}</h4>
+                  <p class="codex-reason-text">\${reason.body}</p>
+                </article>
+              \`).join('')}
+            </div>
+            <div class="codex-about-actions">
+              <a class="codex-company-link" href="https://comet-event.co.jp/about/" target="_blank" rel="noopener noreferrer">
+                会社概要を見る
+              </a>
             </div>
           </div>
         </section>

@@ -8,9 +8,18 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:all": "vitest run && playwright test --config=playwright.config.ts",
+    "baseline:capture": "playwright test --config=playwright.capture.config.ts"
   },
   "dependencies": {
     "astro": "^4.16.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "vitest": "^3.0.9"
   }
 }

@@ -1,4 +1,8 @@
 import { readFile } from 'node:fs/promises';
+import { gunzipSync } from 'node:zlib';
+import type { Profession } from '../data/professions';
+import { DEFAULT_ABOUT_HIGHLIGHT } from '../data/professions/lawyer';
+import { buildProfessionFormLinks, withBase } from './url';
 
 type VariantKey = 'v2' | 'v3';
 
@@ -19,15 +23,29 @@ const variants: Record<VariantKey, VariantConfig> = {
 };
 
 const profilePhotoPath = '../../input/profile-0426cut-web.jpg';
-const LOGO_URL = '/shigyo-event/comet-logo.png';
-const LOGO_WHITE_URL = '/shigyo-event/comet-logo-white.png';
-const DAIHON_GIF_URL = '/shigyo-event/daihon.gif';
-const CHECKLIST_GIF_URL = '/shigyo-event/checklist.gif';
-const KAIJO_GIF_URL = '/shigyo-event/kaijyo.gif';
 const manifestPattern =
   /(<script type="__bundler\/manifest">\s*)([\s\S]*?)(\s*<\/script>)/;
+const templatePattern =
+  /(<script type="__bundler\/template">\s*)([\s\S]*?)(\s*<\/script>)/;
+const extResourcesPattern =
+  /(<script type="__bundler\/ext_resources">\s*)([\s\S]*?)(\s*<\/script>)/;
 
-export async function renderStandaloneVariant(variantKey: VariantKey) {
+type ManifestEntry = {
+  mime: string;
+  compressed: boolean;
+  data: string;
+};
+
+function normalizeLegacyUrls(html: string): string {
+  return html
+    .replace(/https:\/\/shohei-kondo\.github\.io\/shigyo-event\//g, '/')
+    .replace(/\/shigyo-event\//g, '/');
+}
+
+export async function renderProfessionLp(
+  profession: Profession,
+  variantKey: VariantKey = 'v3',
+) {
   const variant = variants[variantKey];
   const [html, profilePhoto] = await Promise.all([
     readFile(new URL(variant.sourcePath, import.meta.url), 'utf8'),
@@ -40,20 +58,78 @@ export async function renderStandaloneVariant(variantKey: VariantKey) {
     'image/jpeg',
     profilePhoto.toString('base64'),
   );
-  return injectCommonLpAdjustments(patchBundlerShell(withProfileImage), variantKey);
+  const unpacked = unpackBundleAtBuildTime(withProfileImage);
+  return normalizeLegacyUrls(
+    stripLeadingDoctype(
+      injectCommonLpAdjustments(unpacked, variantKey, profession),
+    ),
+  );
 }
 
-function patchBundlerShell(html: string) {
-  // ローディング画面を COMET ロゴに差し替え（シールドSVG＋「イベント幹事サポート」を廃止）。
-  const thumbnailHtml = `<div id="__bundler_thumbnail"><img src="${LOGO_WHITE_URL}" alt="COMET" style="width:min(220px,55vw);height:auto;display:block"></div>`;
-  const patched = html.replace(
-    /<div id="__bundler_thumbnail">[\s\S]*?<\/div>\s*<div id="__bundler_loading">/,
-    `${thumbnailHtml}\n  <div id="__bundler_loading">`,
-  );
-  return patched.replace(
-    '#__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }',
-    '#__bundler_thumbnail img { width: min(220px, 55vw); height: auto; }',
-  );
+/** @deprecated lawyer/v2 比較用。v3 は renderProfessionLp を使用 */
+export async function renderStandaloneVariant(variantKey: VariantKey) {
+  const { lawyer } = await import('../data/professions/lawyer');
+  return renderProfessionLp(lawyer, variantKey);
+}
+
+/** Astro が DOCTYPE を付与するため、ソース側の宣言は除去する。 */
+function stripLeadingDoctype(html: string): string {
+  return html.replace(/^<!DOCTYPE html>\s*/i, '');
+}
+
+/**
+ * クライアント側の __bundler アンパックをビルド時に実行する。
+ * 約19MBの manifest をブラウザで JSON.parse すると固まるため、静的HTMLとして出力する。
+ */
+function unpackBundleAtBuildTime(html: string): string {
+  const manifestMatch = html.match(manifestPattern);
+  const templateMatch = html.match(templatePattern);
+  if (!manifestMatch || !templateMatch) {
+    throw new Error('Bundler manifest/template was not found in the standalone HTML.');
+  }
+
+  const manifest = JSON.parse(manifestMatch[2]) as Record<string, ManifestEntry>;
+  let template = JSON.parse(templateMatch[2]) as string;
+
+  const dataUrls: Record<string, string> = {};
+  for (const [uuid, entry] of Object.entries(manifest)) {
+    let bytes = Buffer.from(entry.data, 'base64');
+    if (entry.compressed) {
+      bytes = gunzipSync(bytes);
+    }
+    dataUrls[uuid] = `data:${entry.mime};base64,${bytes.toString('base64')}`;
+  }
+
+  for (const uuid of Object.keys(manifest)) {
+    template = template.split(uuid).join(dataUrls[uuid]);
+  }
+
+  template = template
+    .replace(/\s+integrity="[^"]*"/gi, '')
+    .replace(/\s+crossorigin="[^"]*"/gi, '');
+
+  const extMatch = html.match(extResourcesPattern);
+  const extResources = extMatch
+    ? (JSON.parse(extMatch[2]) as Array<{ id: string; uuid: string }>)
+    : [];
+  const resourceMap: Record<string, string> = {};
+  for (const entry of extResources) {
+    if (dataUrls[entry.uuid]) {
+      resourceMap[entry.id] = dataUrls[entry.uuid];
+    }
+  }
+
+  const resourceScript =
+    '<script>window.__resources = ' +
+    JSON.stringify(resourceMap).replace(/<\//g, '<\\/') +
+    ';</script>';
+  const headOpen = template.match(/<head[^>]*>/i);
+  if (headOpen) {
+    const insertAt = headOpen.index! + headOpen[0].length;
+    template = template.slice(0, insertAt) + resourceScript + template.slice(insertAt);
+  }
+
+  return template;
 }
 
 function replaceManifestImage(
@@ -67,10 +143,7 @@ function replaceManifestImage(
     throw new Error('Bundler manifest was not found in the standalone HTML.');
   }
 
-  const manifest = JSON.parse(match[2]) as Record<
-    string,
-    { mime: string; compressed: boolean; data: string }
-  >;
+  const manifest = JSON.parse(match[2]) as Record<string, ManifestEntry>;
   if (!manifest[imageId]) {
     throw new Error(`Profile image ID was not found: ${imageId}`);
   }
@@ -92,13 +165,28 @@ function replaceManifestImage(
   ].join('');
 }
 
-function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
+function injectCommonLpAdjustments(
+  html: string,
+  variantKey: VariantKey,
+  profession: Profession,
+) {
+  const links = buildProfessionFormLinks(profession.slug);
+  const logoUrl = withBase('comet-logo.png');
+  const logoWhiteUrl = withBase('comet-logo-white.png');
   const payload = JSON.stringify({
     variantKey,
+    profession: {
+      eyebrow: profession.eyebrow,
+      heroLead: profession.hero.lead,
+      issuesTitleHtml: profession.issuesTitleHtml,
+      heroImageAlt: profession.heroImageAlt,
+      aboutHighlight: profession.aboutHighlight ?? DEFAULT_ABOUT_HIGHLIGHT,
+    },
+    links,
     deliverables: {
-      daihon: DAIHON_GIF_URL,
-      checklist: CHECKLIST_GIF_URL,
-      venue: KAIJO_GIF_URL,
+      daihon: withBase('daihon.gif'),
+      checklist: withBase('checklist.gif'),
+      venue: withBase('kaijyo.gif'),
     },
   });
   const injection = `
@@ -1361,9 +1449,9 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
         <header class="codex-site-header">
           <div class="codex-site-header__inner">
             <a class="codex-site-header__logo" href="#" aria-label="ページ先頭へ">
-              <img src="${LOGO_URL}" alt="株式会社COMET" />
+              <img src="${logoUrl}" alt="株式会社COMET" />
             </a>
-            <a class="codex-site-header__cta" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+            <a class="codex-site-header__cta" href="\${attr(custom.links.freeConsultation)}">まずは無料で相談する</a>
           </div>
         </header>
       \`;
@@ -1383,20 +1471,19 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
         <section class="codex-hero">
           <div class="codex-hero__inner">
             <div>
-              <span class="codex-hero__eyebrow">弁護士会・支部向け</span>
+              <span class="codex-hero__eyebrow">\${attr(custom.profession.eyebrow)}</span>
               <h1 class="codex-hero__title">持ち回りの幹事業務、<br><span class="codex-hero__title-nowrap">“なんとなく例年通り”で</span><br>進めていませんか？</h1>
               <p class="codex-hero__lead">
-                研修後の懇親会、支部総会、忘年会・新年会。先生方同士の関係づくりや支部活動への参加意欲に関わる大切な機会ですが、
-                会場選び、案内、進行、当日の確認が幹事様に集中しがちです。
+                \${attr(custom.profession.heroLead)}
               </p>
               <div class="codex-hero__actions">
-                <a class="codex-hero__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+                <a class="codex-hero__button" href="\${attr(custom.links.freeConsultation)}">まずは無料で相談する</a>
                 <a class="codex-hero__button codex-hero__button--secondary" href="#plan-guide">プランを確認する</a>
               </div>
             </div>
             \${heroImage ? \`
               <div class="codex-hero__image">
-                <img src="\${attr(heroImage)}" alt="弁護士会・支部イベントの様子">
+                <img src="\${attr(heroImage)}" alt="\${attr(custom.profession.heroImageAlt)}">
               </div>
             \` : ''}
           </div>
@@ -1428,7 +1515,7 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
         <section class="codex-common-issues">
           <div class="codex-issues__inner">
             <span class="codex-issues__eyebrow">COMMON ISSUES</span>
-            <h2 class="codex-issues__title">弁護士会・支部イベントで、<br>こんなお困りごとはありませんか？</h2>
+            <h2 class="codex-issues__title">\${custom.profession.issuesTitleHtml}</h2>
             <div class="codex-issues__grid">
               \${issues.map((issue, index) => \`
                 <article class="codex-issue">
@@ -1460,37 +1547,37 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
           type: 'free',
           problem: 'まだ何も決まっていない',
           label: '無料相談',
-          href: '/shigyo-event/forms/free-consultation/',
+          href: custom.links.freeConsultation,
         },
         {
           type: 'free',
           problem: '何を準備すればよいか、いったん整理したい',
           label: '無料相談',
-          href: '/shigyo-event/forms/free-consultation/',
+          href: custom.links.freeConsultation,
         },
         {
           type: 'venue',
           problem: '候補の探し方・比較軸から相談したい',
           label: '会場選びサポート（2万円）',
-          href: '/shigyo-event/forms/venue-support/',
+          href: custom.links.venueSupport,
         },
         {
           type: 'venue',
           problem: '会場候補はあるが、条件比較に迷っている',
           label: '会場選びサポート（2万円）',
-          href: '/shigyo-event/forms/venue-support/',
+          href: custom.links.venueSupport,
         },
         {
           type: 'script',
           problem: '当日の流れ・司会コメントを整えたい',
           label: '進行表・台本作成（3万円）',
-          href: '/shigyo-event/forms/script-support/',
+          href: custom.links.scriptSupport,
         },
         {
           type: 'both',
           problem: '会場も進行も、まとめて見てほしい',
           label: 'まず無料相談へ',
-          href: '/shigyo-event/forms/free-consultation/',
+          href: custom.links.freeConsultation,
         },
       ];
 
@@ -1514,7 +1601,7 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
               迷った場合は、まず無料相談で状況を伺ったうえで、必要なサポート範囲を一緒に整理します。
             </p>
             <div class="codex-plan__actions">
-              <a class="codex-plan__button" href="/shigyo-event/forms/free-consultation/">まずは無料で相談する</a>
+              <a class="codex-plan__button" href="\${attr(custom.links.freeConsultation)}">まずは無料で相談する</a>
             </div>
           </div>
         </section>
@@ -1630,7 +1717,7 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
                   私たちはイベントを通じて「人生を豊かにする"きっかけ"」づくりを行っています。
                 </p>
                 <p class="codex-about-text">
-                  今まで、過去に300名以上をお招きする弁護士会様のセミナー運営や、某省の大臣や国会議員をお招きしたVIP対応を含む医師会様のお集まり等、数多くの士業の皆さまのイベントをお手伝いしてきました。
+                  \${attr(custom.profession.aboutHighlight)}
                 </p>
                 <p class="codex-about-text">
                   普段の業務もお忙しいなか、一生懸命にイベントのご準備をされる事務局の皆さまや幹事の皆さまの姿に心打たれ「もっと皆さまのお力になることができないか？」、そう考えこのサービスを展開させていただくことを決めました。
@@ -1668,7 +1755,7 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
           <div class="codex-site-footer__inner">
             <div class="codex-site-footer__top">
               <div class="codex-site-footer__brand">
-                <img class="codex-site-footer__logo" src="${LOGO_WHITE_URL}" alt="株式会社COMET">
+                <img class="codex-site-footer__logo" src="${logoWhiteUrl}" alt="株式会社COMET">
                 <div class="codex-site-footer__brand-text">
                   <span class="codex-site-footer__label">OPERATED BY</span>
                   <a class="codex-site-footer__company" href="\${aboutUrl}" target="_blank" rel="noopener noreferrer">運営会社：株式会社COMET</a>

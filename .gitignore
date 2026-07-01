@@ -40,5 +40,10 @@ input/*
 # Astro 自動生成・ローカル生成物
 src/env.d.ts
 
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
 # ロックファイルは追跡しない方針（デプロイは npm install で実行）
 package-lock.json

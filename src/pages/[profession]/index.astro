@@ -1,72 +1,16 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Hero from '../../components/Hero.astro';
-import Empathy from '../../components/Empathy.astro';
-import Services from '../../components/Services.astro';
-import Pricing from '../../components/Pricing.astro';
-import UseCases from '../../components/UseCases.astro';
-import Flow from '../../components/Flow.astro';
-import Faq from '../../components/Faq.astro';
-import ContactCta from '../../components/ContactCta.astro';
+import { renderProfessionLp } from '../../lib/standaloneHtml';
 import { professions } from '../../data/professions';
-import { services } from '../../data/common';
-import { formLink } from '../../lib/url';
 
-// 個別LPは professions のデータから静的生成する。
-// 横展開時は src/data/professions/ にデータを追加するだけでページが増える。
 export function getStaticPaths() {
-  return professions
-    .filter((profession) => profession.slug !== 'lawyer')
-    .map((profession) => ({
-      params: { profession: profession.slug },
-      props: { profession },
-    }));
+  return professions.map((profession) => ({
+    params: { profession: profession.slug },
+    props: { profession },
+  }));
 }
 
 const { profession } = Astro.props;
-const freePlan = services.find((s) => s.id === 'free')!;
-const heroCtaHref = formLink(freePlan.formSlug, {
-  from: profession.slug,
-  plan: 'free',
-});
+const html = await renderProfessionLp(profession, 'v3');
 ---
 
-<BaseLayout
-  title={profession.title}
-  description={profession.hero.lead}
-  headerHref="#top"
->
-  <a slot="header-cta" class="btn btn-primary header-cta" href={heroCtaHref}>
-    まずは無料で相談する
-  </a>
-
-  <div id="top"></div>
-  <Hero
-    headline={profession.hero.headline}
-    lead={profession.hero.lead}
-    ctaHref={heroCtaHref}
-    ctaLabel={freePlan.cta}
-    label={profession.label}
-  />
-  <Empathy />
-  <Services professionSlug={profession.slug} />
-  <Pricing professionSlug={profession.slug} />
-  <UseCases label={profession.label} eventExamples={profession.eventExamples} />
-  <Flow />
-  <Faq />
-  <ContactCta professionSlug={profession.slug} />
-</BaseLayout>
-
-<style>
-  .header-cta {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 560px) {
-    .header-cta {
-      padding: 8px 14px;
-      font-size: 0.82rem;
-    }
-  }
-</style>
+<Fragment set:html={html} />

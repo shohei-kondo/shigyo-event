@@ -1489,7 +1489,7 @@ function injectCommonLpAdjustments(html: string, variantKey: VariantKey) {
         {
           type: 'both',
           problem: '会場も進行も、まとめて見てほしい',
-          label: '両方のサポート（5万円〜）',
+          label: 'まず無料相談へ',
           href: '/shigyo-event/forms/free-consultation/',
         },
       ];

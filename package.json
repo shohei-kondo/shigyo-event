@@ -7,6 +7,8 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "build:prod": "node --input-type=module -e \"process.env.DEPLOY_TARGET='production';import {execSync} from 'node:child_process';execSync('astro build',{stdio:'inherit',env:process.env});\"",
+    "preview:prod": "node --input-type=module -e \"process.env.DEPLOY_TARGET='production';import {execSync} from 'node:child_process';execSync('astro preview --host 127.0.0.1 --port 4321',{stdio:'inherit',env:process.env});\"",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "cross-env": "^7.0.3",
     "vitest": "^3.0.9"
   }
 }

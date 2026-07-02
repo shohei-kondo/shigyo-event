@@ -28,10 +28,14 @@ describe('astro build output', () => {
     expect(gateway).toContain('noindex');
   });
 
-  it('does not emit legacy /shigyo-event/ paths in HTML', () => {
+  it('uses Pages base paths in gateway HTML', () => {
+    const gateway = readFileSync(join(DIST, 'index.html'), 'utf8');
+    expect(gateway).toContain('/shigyo-event/');
+  });
+
+  it('does not emit client-side bundler shell in profession HTML', () => {
     for (const slug of professionSlugs) {
       const html = readFileSync(join(DIST, slug, 'index.html'), 'utf8');
-      expect(html).not.toContain('/shigyo-event/');
       expect(html).not.toContain('__bundler/manifest');
       expect(html).not.toContain('Unpacking...');
     }

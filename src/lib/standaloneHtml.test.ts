@@ -69,5 +69,7 @@ describe('renderProfessionLp', () => {
     expect(html).not.toContain('Unpacking...');
     expect(html).not.toMatch(/^<!DOCTYPE html>/i);
     expect(html.trimStart().startsWith('<html')).toBe(true);
+    expect(html).not.toContain('data:font/woff2');
+    expect(html).toContain('/lp-assets/');
   });
 });

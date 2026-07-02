@@ -1,4 +1,7 @@
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import type { Profession } from '../data/professions';
 import { DEFAULT_ABOUT_HIGHLIGHT } from '../data/professions/lawyer';
@@ -37,9 +40,63 @@ type ManifestEntry = {
 };
 
 function normalizeLegacyUrls(html: string): string {
+  const base = import.meta.env.BASE_URL;
   return html
-    .replace(/https:\/\/shohei-kondo\.github\.io\/shigyo-event\//g, '/')
-    .replace(/\/shigyo-event\//g, '/');
+    .replace(/https:\/\/shohei-kondo\.github\.io\/shigyo-event\//g, base)
+    .replace(/\/shigyo-event\//g, base);
+}
+
+const writtenAssetUrls = new Map<string, string>();
+const contentHashToUrl = new Map<string, string>();
+
+function mimeToExtension(mime: string): string {
+  const extensions: Record<string, string> = {
+    'font/woff2': 'woff2',
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'text/javascript': 'js',
+  };
+  const extension = extensions[mime];
+  if (!extension) {
+    throw new Error(`Unsupported manifest mime type: ${mime}`);
+  }
+  return extension;
+}
+
+function getLpAssetsDir(): string {
+  return join(process.cwd(), 'dist', 'lp-assets');
+}
+
+function ensureAssetFile(uuid: string, entry: ManifestEntry): string {
+  const cached = writtenAssetUrls.get(uuid);
+  if (cached) {
+    return cached;
+  }
+
+  let bytes = Buffer.from(entry.data, 'base64');
+  if (entry.compressed) {
+    bytes = gunzipSync(bytes);
+  }
+
+  const hash = createHash('sha256').update(bytes).digest('hex').slice(0, 16);
+  let url = contentHashToUrl.get(hash);
+  if (!url) {
+    const base = import.meta.env.BASE_URL;
+    const extension = mimeToExtension(entry.mime);
+    const filename = `${hash}.${extension}`;
+    url = `${base}lp-assets/${filename}`;
+
+    const assetsDir = getLpAssetsDir();
+    mkdirSync(assetsDir, { recursive: true });
+    const filePath = join(assetsDir, filename);
+    if (!existsSync(filePath)) {
+      writeFileSync(filePath, bytes);
+    }
+    contentHashToUrl.set(hash, url);
+  }
+
+  writtenAssetUrls.set(uuid, url);
+  return url;
 }
 
 export async function renderProfessionLp(
@@ -91,17 +148,13 @@ function unpackBundleAtBuildTime(html: string): string {
   const manifest = JSON.parse(manifestMatch[2]) as Record<string, ManifestEntry>;
   let template = JSON.parse(templateMatch[2]) as string;
 
-  const dataUrls: Record<string, string> = {};
+  const assetUrls: Record<string, string> = {};
   for (const [uuid, entry] of Object.entries(manifest)) {
-    let bytes = Buffer.from(entry.data, 'base64');
-    if (entry.compressed) {
-      bytes = gunzipSync(bytes);
-    }
-    dataUrls[uuid] = `data:${entry.mime};base64,${bytes.toString('base64')}`;
+    assetUrls[uuid] = ensureAssetFile(uuid, entry);
   }
 
   for (const uuid of Object.keys(manifest)) {
-    template = template.split(uuid).join(dataUrls[uuid]);
+    template = template.split(uuid).join(assetUrls[uuid]);
   }
 
   template = template
@@ -114,8 +167,8 @@ function unpackBundleAtBuildTime(html: string): string {
     : [];
   const resourceMap: Record<string, string> = {};
   for (const entry of extResources) {
-    if (dataUrls[entry.uuid]) {
-      resourceMap[entry.id] = dataUrls[entry.uuid];
+    if (assetUrls[entry.uuid]) {
+      resourceMap[entry.id] = assetUrls[entry.uuid];
     }
   }
 

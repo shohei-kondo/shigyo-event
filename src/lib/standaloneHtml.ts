@@ -1893,6 +1893,7 @@ function injectCommonLpAdjustments(
       normalizeMobileOverflow();
       if (headerDone && heroDone && realitiesDone && issuesDone && planGuideDone && deliverablesDone && aboutDone && footerDone) {
         applied = true;
+        scheduleStabilityCheck();
         [120, 500, 1200, 2500].forEach((delay) => {
           setTimeout(() => {
             ensureRuntimeStyles();
@@ -1907,16 +1908,54 @@ function injectCommonLpAdjustments(
       return false;
     }
 
-    if (!apply()) {
+    let stabilityTimer;
+
+    function scheduleStabilityCheck() {
+      clearTimeout(stabilityTimer);
+      stabilityTimer = setTimeout(() => {
+        const bodyText = document.body?.textContent || '';
+        const deliverablesReady =
+          !!document.querySelector('.codex-deliverables') &&
+          bodyText.includes('進行台本') &&
+          !bodyText.includes('司会台本（Wordファイル）');
+        if (deliverablesReady || custom.variantKey !== 'v3') {
+          document.documentElement.dataset.codexStaticReady = 'true';
+          return;
+        }
+        applied = false;
+        delete document.documentElement.dataset.codexStaticReady;
+        tryApply();
+      }, 2000);
+    }
+
+    function markReadyIfApplied() {
+      if (applied) {
+        scheduleStabilityCheck();
+      }
+    }
+
+    function tryApply() {
+      if (apply()) {
+        markReadyIfApplied();
+        return true;
+      }
+      return false;
+    }
+
+    if (!tryApply()) {
       const observer = new MutationObserver(() => {
-        if (apply()) observer.disconnect();
+        if (tryApply()) observer.disconnect();
       });
       observer.observe(document.documentElement, { childList: true, subtree: true });
-      window.addEventListener('load', apply, { once: true });
-      setTimeout(() => {
-        apply();
-        observer.disconnect();
-      }, 8000);
+      window.addEventListener('load', () => tryApply(), { once: true });
+
+      const started = Date.now();
+      const retry = setInterval(() => {
+        if (tryApply() || Date.now() - started > 120000) {
+          clearInterval(retry);
+          observer.disconnect();
+        }
+      }, 500);
     }
   })();
 </script>`;

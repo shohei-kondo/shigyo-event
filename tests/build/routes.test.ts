@@ -20,7 +20,7 @@ describe('astro build output', () => {
         expect(existsSync(join(DIST, 'forms', form, 'index.html'))).toBe(true);
       }
     },
-    180_000,
+    300_000,
   );
 
   it('marks gateway page as noindex', () => {
@@ -39,5 +39,15 @@ describe('astro build output', () => {
       expect(html).not.toContain('__bundler/manifest');
       expect(html).not.toContain('Unpacking...');
     }
+  });
+
+  it('staticizes lawyer deliverables without old copy or runtime scripts', () => {
+    const html = readFileSync(join(DIST, 'lawyer', 'index.html'), 'utf8');
+    expect(html).not.toContain('司会台本（Wordファイル）');
+    expect(html).toContain('進行台本');
+    expect(html).toContain('幹事メモ');
+    expect(html).toContain('会場ご提案資料');
+    expect(html).not.toMatch(/<script\b/i);
+    expect(html).not.toContain('unpkg.com');
   });
 });

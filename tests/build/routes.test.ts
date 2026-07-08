@@ -10,7 +10,7 @@ describe('astro build output', () => {
   it(
     'builds all profession and form routes',
     () => {
-      execSync('npm run build', { stdio: 'pipe', timeout: 120_000 });
+      execSync('npm run build:pages', { stdio: 'pipe', timeout: 120_000 });
 
       for (const slug of professionSlugs) {
         expect(existsSync(join(DIST, slug, 'index.html'))).toBe(true);

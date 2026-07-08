@@ -5,4 +5,4 @@
 //
 // 空文字のままにすると、フォームは「スタブ動作」（実送信せず確認画面のみ表示）になる。
 // GAS のセットアップ手順は gas/README.md を参照。
-export const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzcCfZX_RJqohpEYpnOFlQdC9_bm3rStiOjmm3UosttTkBc0UrmPN_qZYDL8oXwf9bF3Q/exec';
+export const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwsixfWnrENg0zVx7S4MzUrthhK4gJ8V6TBhtMDrw_tqS5UMiTSkiK7WsH_noGBRu3bSg/exec';

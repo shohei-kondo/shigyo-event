@@ -72,7 +72,7 @@ npm run dev
 
 ```powershell
 npm test              # Vitest（ユニット・ビルドテスト）… 約10〜90秒
-npm run test:e2e      # Playwright（要: 先に npm run build）… 約40秒
+npm run test:e2e      # Playwright（要: 先に npm run build＝本番ターゲット）… 約40秒
 npm run test:all      # 上記2つを連続実行
 ```
 
@@ -99,7 +99,11 @@ npm run baseline:capture
 npm run build
 ```
 
-`dist/` フォルダに静的 HTML が出力されます。
+`dist/` フォルダに静的 HTML が出力されます（`DEPLOY_TARGET=production`・ルート配信用）。
+GitHub Pages 用のビルドは `npm run build:pages`（`/shigyo-event/` サブパス付き）。
+
+ビルド後は `dist/BUILD_INFO.txt` を開き、`target: production` になっていることを
+確認してからアップロードする（Pages用ビルドの誤アップロード防止）。
 
 ### ビルド結果のプレビュー
 
@@ -127,8 +131,9 @@ npm run preview
 
 1. `npm run test:all` でテスト通過を確認
 2. `npm run build`
-3. （推奨）`npm run preview` で目視確認
-4. **ファイルマネージャー**で `dist/` **の中身**をサブドメインのドキュメントルートへアップロード  
+3. `dist/BUILD_INFO.txt` が `target: production` であることを確認
+4. （推奨）`npm run preview:prod` で目視確認
+5. **ファイルマネージャー**で `dist/` **の中身**をサブドメインのドキュメントルートへアップロード  
    - NG: `dist` フォルダごと上げる → `…/dist/lawyer/` になる  
    - OK: `index.html`, `lawyer/`, `forms/` 等をルート直下に配置
 
